@@ -1,9 +1,9 @@
 #define SW_IN PB1 //ADC9
-#define VNH2_SP30_EN PB10 //PB10 T2C3N B10
+//#define VNH2_SP30_EN PB10 //PB10 T2C3N B10
 //#define VNH2_SP30_CS PB1 //ADC9
-#define VNH2_SP30_INA PB8 //PB8 T4C3 B8
-#define VNH2_SP30_INB PB9 //PB9 T4C4 B9
-#define VNH2_SP30_PWM PA0 //PA0 T2C1 A0
+//#define VNH2_SP30_INA PB8 //PB8 T4C3 B8
+//#define VNH2_SP30_INB PB9 //PB9 T4C4 B9
+//#define VNH2_SP30_PWM PA0 //PA0 T2C1 A0
 
 
 uint8_t keyValue = 5; // Состояние покоя
@@ -18,15 +18,15 @@ volatile uint16_t ticktock = 0;
 void setup() {
   // put your setup code here, to run once:
   pinMode(SW_IN, INPUT_ANALOG);
-  pinMode(VNH2_SP30_EN, OUTPUT);
-  pinMode(VNH2_SP30_INA, OUTPUT );
-  pinMode(VNH2_SP30_INB, OUTPUT );
-  pinMode(VNH2_SP30_PWM, PWM);
+ // pinMode(VNH2_SP30_EN, OUTPUT);
+ // pinMode(VNH2_SP30_INA, OUTPUT );
+ // pinMode(VNH2_SP30_INB, OUTPUT );
+ // pinMode(VNH2_SP30_PWM, PWM);
   
   timer_2.pause();
   timer_3.pause();
   timer_2.setPeriod(SWITCH_LOOP_TIME); // in microseconds
-  timer_3.setPeriod(20);
+  timer_3.setPeriod(20000);
   timer_2.setMode(TIMER_CH1, TIMER_OUTPUT_COMPARE);
   timer_3.setMode(TIMER_CH2, TIMER_OUTPUT_COMPARE);
   timer_2.setCompare(TIMER_CH1, 1);
