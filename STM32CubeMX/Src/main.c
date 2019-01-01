@@ -54,7 +54,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "u8g2\u8g2.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -77,6 +77,8 @@ ADC_HandleTypeDef hadc1;
 
 CRC_HandleTypeDef hcrc;
 
+I2C_HandleTypeDef hi2c1;
+
 RTC_HandleTypeDef hrtc;
 
 TIM_HandleTypeDef htim1;
@@ -90,6 +92,8 @@ uint8_t newKeyValue = 5;
 uint16_t adc;
 const uint16_t values[5] = {0, 564, 1215, 2075, 2300};
 const uint8_t error     = 65;                     // ¬еличина отклонени€ от значений - погрешность
+static u8g2_t u8g2;
+uint32_t amountsent =0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,12 +104,118 @@ static void MX_RTC_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_CRC_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint8_t u8x8_stm32_gpio_and_delay(U8X8_UNUSED u8x8_t *u8x8,
+    U8X8_UNUSED uint8_t msg, U8X8_UNUSED uint8_t arg_int,
+    U8X8_UNUSED void *arg_ptr)
+{
+  switch (msg)
+  {
+  case U8X8_MSG_GPIO_AND_DELAY_INIT:
+    HAL_Delay(1);
+    break;
+  case U8X8_MSG_DELAY_MILLI:
+    HAL_Delay(arg_int);
+    break;
+  }
+  return 1;
+}
+uint8_t u8x8_gpio_and_delay_mine(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
+{
+   switch(msg)
+  {
+    case U8X8_MSG_GPIO_AND_DELAY_INIT:
+      /* only support for software I2C*/
+      break;
+    case U8X8_MSG_DELAY_NANO:
+      /* not required for SW I2C */
+      break;
+    case U8X8_MSG_DELAY_10MICRO:
+      /* not used at the moment */
+      break;
+    case U8X8_MSG_DELAY_100NANO:
+      /* not used at the moment */
+      break;
+    case U8X8_MSG_DELAY_MILLI:
+      //delay_micro_seconds(arg_int*1000UL);
+      break;
+    case U8X8_MSG_DELAY_I2C:
+      /* arg_int is 1 or 4: 100KHz (5us) or 400KHz (1.25us) */
+      //delay_micro_seconds(arg_int<=2?5:1);
+      break;
+    case U8X8_MSG_GPIO_I2C_CLOCK:
+     break;
+    case U8X8_MSG_GPIO_I2C_DATA:
+      break;
+/*
+    case U8X8_MSG_GPIO_MENU_SELECT:
+      u8x8_SetGPIOResult(u8x8, Chip_GPIO_GetPinState(LPC_GPIO, KEY_SELECT_PORT, KEY_SELECT_PIN));
+      break;
+    case U8X8_MSG_GPIO_MENU_NEXT:
+      u8x8_SetGPIOResult(u8x8, Chip_GPIO_GetPinState(LPC_GPIO, KEY_NEXT_PORT, KEY_NEXT_PIN));
+      break;
+    case U8X8_MSG_GPIO_MENU_PREV:
+      u8x8_SetGPIOResult(u8x8, Chip_GPIO_GetPinState(LPC_GPIO, KEY_PREV_PORT, KEY_PREV_PIN));
+      break;
+
+    case U8X8_MSG_GPIO_MENU_HOME:
+      u8x8_SetGPIOResult(u8x8, Chip_GPIO_GetPinState(LPC_GPIO, KEY_HOME_PORT, KEY_HOME_PIN));
+      break;
+*/
+    default:
+      //u8x8_SetGPIOResult(u8x8, 1);
+      break;
+  }
+  return 1;
+}
+
+uint8_t u8x8_byte_stm32f103_hw_i2c(U8X8_UNUSED u8x8_t *u8x8, U8X8_UNUSED uint8_t msg, U8X8_UNUSED uint8_t arg_int, U8X8_UNUSED void *arg_ptr)
+{
+#define MAX_LEN 32
+  static uint8_t vals[MAX_LEN];
+  static uint8_t length=0;
+
+  U8X8_UNUSED uint8_t *args = arg_ptr;
+  switch(msg)  {
+  case U8X8_MSG_BYTE_SEND: {
+    if ((arg_int+length) <= MAX_LEN)
+      for(int i=0; i<arg_int; i++) {
+        vals[length] = args[i];
+        length++;
+      }
+      break;
+  }
+  case U8X8_MSG_BYTE_INIT: {
+     break;
+  }
+  case U8X8_MSG_BYTE_SET_DC: {
+     break;
+  }
+  case U8X8_MSG_BYTE_START_TRANSFER: {
+     length = 0;
+    break;
+  }
+  case U8X8_MSG_BYTE_END_TRANSFER: {
+      while(HAL_I2C_GetState (&hi2c1) != HAL_I2C_STATE_READY) { /* empty */ }
+    const uint8_t addr = 0x78;
+    HAL_I2C_Master_Transmit(&hi2c1, addr, vals, length, 10);
+    amountsent+= length;
+    break;
+  }
+  default: {
+       return 0;
+  }
+  }
+  return 1;
+}
+
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim->Instance==TIM1)
@@ -140,16 +250,22 @@ uint8_t ReadCruiseSwitch() {
         break;
       case 1://RES
         {
+        	if (s<100)
+        	{
         	s+=10;
         	setMSpeed(s);
+        	}
         	HAL_GPIO_TogglePin(PC13_GPIO_Port, PC13_Pin);
         	CDC_Transmit_FS(keyValue,sizeof(keyValue));
         }
         break;
       case 2://SET
         {
+        	if (s>-100)
+        	{
         	s-=10;
         	setMSpeed(s);
+        	}
         	HAL_GPIO_TogglePin(PC13_GPIO_Port, PC13_Pin);
         	CDC_Transmit_FS(keyValue,sizeof(keyValue));
         }
@@ -225,6 +341,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	  uint32_t i,d,pwm_value=0 ,step=1;
+	  char tmp_string[8];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -251,16 +368,28 @@ int main(void)
   MX_TIM1_Init();
   MX_CRC_Init();
   MX_TIM2_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  u8g2_Setup_ssd1306_i2c_128x64_noname_1(&u8g2,U8G2_R0,u8x8_byte_stm32f103_hw_i2c,u8x8_gpio_and_delay_mine);
+  u8g2_InitDisplay(&u8g2); // send init sequence to the display, display is in sleep mode after this,
+  u8g2_SetPowerSave(&u8g2, 0); // wake up display
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
+	  u8g2_FirstPage(&u8g2);
+	      do
+	      {
+	        u8g2_SetFont(&u8g2, u8g2_font_7x14_mr);
+	        u8g2_DrawStr(&u8g2, 0, 15, "PWM");
+	        itoa(s, tmp_string, 10);
+	        u8g2_DrawStr(&u8g2, 25, 15, tmp_string);
+	      } while (u8g2_NextPage(&u8g2));
 	  if (ticktock >= 1)
 	  {
 		  ReadCruiseSwitch();
@@ -399,6 +528,40 @@ static void MX_CRC_Init(void)
   /* USER CODE BEGIN CRC_Init 2 */
 
   /* USER CODE END CRC_Init 2 */
+
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
 
 }
 
@@ -593,10 +756,10 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PB0 PB2 PB11 PB12 
                            PB13 PB14 PB15 PB3 
-                           PB4 PB5 PB6 PB7 */
+                           PB4 PB5 */
   GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_2|GPIO_PIN_11|GPIO_PIN_12 
                           |GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15|GPIO_PIN_3 
-                          |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
+                          |GPIO_PIN_4|GPIO_PIN_5;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 

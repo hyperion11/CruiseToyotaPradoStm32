@@ -132,6 +132,7 @@ uint8_t ReadCruiseSwitch() {
     switch (keyValue) {
       case 0://ON-OFF
         {
+        	s=0;
         	setMSpeed(0);
         	HAL_GPIO_TogglePin(PC13_GPIO_Port, PC13_Pin);
         	CDC_Transmit_FS(keyValue,sizeof(keyValue));
@@ -139,7 +140,7 @@ uint8_t ReadCruiseSwitch() {
         break;
       case 1://RES
         {
-        	s++;
+        	s+=10;
         	setMSpeed(s);
         	HAL_GPIO_TogglePin(PC13_GPIO_Port, PC13_Pin);
         	CDC_Transmit_FS(keyValue,sizeof(keyValue));
@@ -147,7 +148,7 @@ uint8_t ReadCruiseSwitch() {
         break;
       case 2://SET
         {
-        	s--;
+        	s-=10;
         	setMSpeed(s);
         	HAL_GPIO_TogglePin(PC13_GPIO_Port, PC13_Pin);
         	CDC_Transmit_FS(keyValue,sizeof(keyValue));
@@ -188,6 +189,10 @@ void setMSpeed(int speed)
     speed = -speed;  // Make speed a positive quantity
     reverse = 1;  // Preserve the direction
   }
+  else
+	  reverse=0;
+
+
   if (speed > 100)  // Max PWM dutycycle
     speed = 100;
   TIM2->CCR1=speed;
@@ -519,9 +524,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 3;
+  htim2.Init.Prescaler = 35;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 899;
+  htim2.Init.Period = 99;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
@@ -535,7 +540,7 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 449;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
