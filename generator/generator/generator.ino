@@ -128,13 +128,13 @@ class MyLcdKeypadAdapter : public LcdKeypadAdapter
 
 uint16_t _pulse_dur_spd(uint8_t _speedkmh)//mks
 {
-  return (float(pulse_for_1kmh) / float(_speedkmh) * 20.0f ); //every 100mks
+  return (float(600) / float(_speedkmh) * 20.0f ); //every 50mks
 }
 
 
 uint16_t _pulse_dur_tach(uint16_t _rpm)
 {
-  return int(((1 / (float(_rpm) / 20.0f)) * 1000.0f) * 20.0f); //every 100mks
+  return int(((1 / (float(_rpm) / 20.0f)) * 1000.0f) * 20.0f); //every 50mks
 }
 
 void setup() {
