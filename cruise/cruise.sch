@@ -19957,7 +19957,7 @@ package type P</description>
 <sheet>
 <plain>
 <text x="43.18" y="96.52" size="1.778" layer="91">5v max</text>
-<text x="20.32" y="86.36" size="1.778" layer="91">15v max</text>
+<text x="20.32" y="86.36" size="1.778" layer="91">5v max</text>
 <text x="20.32" y="68.58" size="1.778" layer="91">15v max</text>
 <text x="20.32" y="45.72" size="1.778" layer="91">15v max</text>
 <text x="20.32" y="33.02" size="1.778" layer="91">15v max</text>
