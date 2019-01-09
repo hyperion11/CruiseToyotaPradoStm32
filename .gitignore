@@ -15,3 +15,9 @@ STM32CubeMX/Middlewares/*
 *.s#7
 *.s#8
 *.s#9
+*.launch
+*.prefs
+STM32CubeMX/.settings/language.settings.xml
+STM32CubeMX/.settings/language.settings.xml
+STM32CubeMX/.settings/org.eclipse.cdt.codan.core.prefs
+STM32CubeMX/.cproject
