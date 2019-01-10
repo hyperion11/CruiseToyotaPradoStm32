@@ -21,3 +21,5 @@ STM32CubeMX/.settings/language.settings.xml
 STM32CubeMX/.settings/language.settings.xml
 STM32CubeMX/.settings/org.eclipse.cdt.codan.core.prefs
 STM32CubeMX/.cproject
+STM32CubeMX/.settings/language.settings.xml
+*.xml
