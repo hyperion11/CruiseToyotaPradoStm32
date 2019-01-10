@@ -72,6 +72,8 @@
 #define Switch_Data 2
 #define CCV 0
 #define CV 1
+#define font_w 9
+#define font_h 8
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -94,20 +96,19 @@ TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN PV */
 volatile uint16_t ticktock = 0;
-uint16_t ADC_Data[3]; //0-Current Sensor CH7;;;; 1-TPS CH8;;;; 2-Switch;;;;
-uint8_t keyValue = 5; // Состояние покоя
+volatile uint16_t ADC_Data[3]; //0-Current Sensor CH7;;;; 1-TPS CH8;;;; 2-Switch;;;;
+volatile uint8_t keyValue = 5; // Состояние покоя
 volatile int s = 0;
-bool dir_current, dir_previous;
-uint16_t rpm_ticks = 0, rpm = 0;
+volatile bool dir_current, dir_previous;
+volatile uint16_t rpm_ticks = 0, rpm = 0;
 volatile uint16_t second;
-uint8_t newKeyValue = 5;
+volatile uint8_t newKeyValue = 5;
 const uint16_t values[5] = { 0, 564, 1215, 2075, 2300 };
 const uint8_t error = 65;       // Величина отклонения от значений - погрешность
 static u8g2_t u8g2;
 uint32_t amountsent = 0;
-uint32_t IC_Rising_Val; // Direct mode	Rising Edge Detection
-uint32_t IC_Faling_Val; // Direct mode	Faling Edge Detection
-uint32_t SPD_Pulse_width;
+volatile uint32_t IC_Faling_Val; // Direct mode	Faling Edge Detection
+volatile uint32_t SPD_Pulse_width;
 volatile bool lowspeed = true;
 float spd;
 
@@ -391,6 +392,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM1) {
+
 		readGPIO();
 		CheckCruiseAndDisarm(STP, AT_D, IDLE, rpm, SPD_CURRENT);
 		readADC();
@@ -412,75 +414,55 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) // =RISING= EDGE DETECTED
-		IC_Rising_Val = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) // =FALLING= EDGE DETECTED
-			{
+		__HAL_TIM_SET_COUNTER(&htim3, 0x00);
+	else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) // =FALLING= EDGE DETECTED
 		IC_Faling_Val = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
-		__HAL_TIM_SET_COUNTER(&htim3, 0x00); // Reset Counter After Input Capture Interrupt Occurs
-		SPD_Pulse_width = (IC_Faling_Val - IC_Rising_Val) * 10;
-		if (SPD_Pulse_width > 300000 || SPD_Pulse_width < 1000) {
-			lowspeed = true;
-			SPD_Pulse_width = 0;
-		} else
-			lowspeed = false;
-	}
 }
 
 void showpage(uint16_t page) {
-	char tmp_string[8];
+	char tmp_string[6];
 	switch (page) {
-	case 0: {
-		u8g2_FirstPage(&u8g2);
-		do {
-			u8g2_SetFont(&u8g2, u8g2_font_7x14_mr);
-			u8g2_DrawStr(&u8g2, 0, 15, "PWM");
-			//	itoa(s, tmp_string, 10);
-			u8g2_DrawStr(&u8g2, 40, 15, tmp_string);
-			u8g2_DrawStr(&u8g2, 0, 30, "RISE");
-			itoa(IC_Rising_Val * 10, tmp_string, 10);
-			u8g2_DrawStr(&u8g2, 40, 30, tmp_string);
-			u8g2_DrawStr(&u8g2, 0, 45, "FALL");
-			itoa(IC_Faling_Val * 10, tmp_string, 10);
-			u8g2_DrawStr(&u8g2, 40, 45, tmp_string);
-			u8g2_DrawStr(&u8g2, 0, 60, "PERIOD");
-			//if (lowspeed == false) {
-			itoa(SPD_Pulse_width, tmp_string, 10);
-			u8g2_DrawStr(&u8g2, 50, 60, tmp_string);
-			//	} else
-			//	u8g2_DrawStr(&u8g2, 50, 60, "LOW SPEED");
-			itoa(rpm, tmp_string, 10);
-			u8g2_DrawStr(&u8g2, 80, 15, tmp_string);
-			itoa((int) (spd + 0.1), tmp_string, 10);
-			u8g2_DrawStr(&u8g2, 90, 30, tmp_string);
-		} while (u8g2_NextPage(&u8g2));
-	}
+	case 0:
 		break;
 	case 1: {
 		u8g2_FirstPage(&u8g2);
 		do {
-			u8g2_SetFont(&u8g2, u8g2_font_7x14_mr);
-			u8g2_DrawStr(&u8g2, 0, 15, "PID");
+			u8g2_SetFont(&u8g2, u8g2_font_artossans8_8u);
+			u8g2_DrawStr(&u8g2, 0, font_h, "PID");
 			itoa(PID_OUT, tmp_string, 10);
-			u8g2_DrawStr(&u8g2, 40, 15, tmp_string);
-
-			u8g2_DrawStr(&u8g2, 0, 30, "CUR");
-			itoa((int) SPD_CURRENT, tmp_string, 10);
-			u8g2_DrawStr(&u8g2, 40, 30, tmp_string);
-
-			u8g2_DrawStr(&u8g2, 0, 45, "TGT");
+			u8g2_DrawStr(&u8g2, font_w * 3, font_h, tmp_string);
+			u8g2_DrawStr(&u8g2, 0, font_h * 2, "CUR");
+			itoa((int) (SPD_CURRENT + 0.1), tmp_string, 10);
+			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 2, tmp_string);
+			u8g2_DrawStr(&u8g2, 0, font_h * 3, "TGT");
 			itoa((int) SPD_TARGET, tmp_string, 10);
-			u8g2_DrawStr(&u8g2, 40, 45, tmp_string);
-			/*
-			 u8g2_DrawStr(&u8g2, 0, 60, "PERIOD");
-			 //if (lowspeed == false) {
-			 itoa(SPD_Pulse_width, tmp_string, 10);
-			 u8g2_DrawStr(&u8g2, 50, 60, tmp_string);
-			 //	} else
-			 //	u8g2_DrawStr(&u8g2, 50, 60, "LOW SPEED");
-			 itoa(rpm, tmp_string, 10);
-			 u8g2_DrawStr(&u8g2, 80, 15, tmp_string);
-			 itoa((int) (spd + 0.1), tmp_string, 10);
-			 u8g2_DrawStr(&u8g2, 90, 30, tmp_string);*/
+			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 3, tmp_string);
+			u8g2_DrawStr(&u8g2, 0, font_h * 4, "IMP");
+			itoa(IC_Faling_Val * 10, tmp_string, 10);
+			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 4, tmp_string);
+			u8g2_DrawStr(&u8g2, 0, font_h * 5, "RPM");
+			itoa(rpm, tmp_string, 10);
+			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 5, tmp_string);
+			u8g2_DrawStr(&u8g2, 0, font_h * 6, "STP");
+			if (STP == true)
+				u8g2_DrawBox(&u8g2, font_w * 3, font_h * 5, font_w, font_h);
+			else
+				u8g2_DrawFrame(&u8g2, font_w * 3, font_h * 5, font_w, font_h);
+			u8g2_DrawStr(&u8g2, 0, font_h * 7, "IDL");
+			if (IDLE == true)
+				u8g2_DrawBox(&u8g2, font_w * 3, font_h * 6, font_w, font_h);
+			else
+				u8g2_DrawFrame(&u8g2, font_w * 3, font_h * 6, font_w, font_h);
+			u8g2_DrawStr(&u8g2, 0, font_h * 8, "ATD");
+			if (AT_D == true)
+				u8g2_DrawBox(&u8g2, font_w * 3, font_h * 7, font_w, font_h);
+			else
+				u8g2_DrawFrame(&u8g2, font_w * 3, font_h * 7, font_w, font_h);
+			u8g2_DrawStr(&u8g2, font_w * 5, font_h * 6, "ATO");
+			if (AT_OD == true)
+				u8g2_DrawBox(&u8g2, font_w * 8, font_h * 5, font_w, font_h);
+			else
+				u8g2_DrawFrame(&u8g2, font_w * 8, font_h * 5, font_w, font_h);
 		} while (u8g2_NextPage(&u8g2));
 	}
 		break;
@@ -568,10 +550,16 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 
 	while (1) {
-		if (SPD_Pulse_width > 0)
-			SPD_CURRENT = 600.0 / (SPD_Pulse_width / 1000.0);
-		else
+		SPD_Pulse_width = IC_Faling_Val * 10;
+		if (SPD_Pulse_width > 300000 || SPD_Pulse_width < 1000) {
+			lowspeed = true;
+			SPD_Pulse_width = 0;
 			SPD_CURRENT = 0;
+		} else {
+			SPD_CURRENT = 600.0 / (SPD_Pulse_width / 1000.0);
+			lowspeed = false;
+		}
+
 		if (CRUISE_ARMED) {
 			pid_error = SPD_CURRENT - SPD_TARGET;
 			PID_OUT = arm_pid_f32(&PID, pid_error);
