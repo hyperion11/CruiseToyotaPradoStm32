@@ -57,6 +57,7 @@
 #include "stdbool.h"
 #include "arm_math.h"
 #include "stdlib.h"
+#include "ftoa.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -74,6 +75,15 @@
 #define CV 1
 #define font_w 9
 #define font_h 8
+#define LONG_PRESS_DURATION 20 //20x100ms-100мс время опроса рычага. 2секунды на распознание долгого нажания
+enum ACTION {
+	UP, DOWN
+};
+enum EDITED_VALUE {
+	PID_P, PID_I, PID_D
+};
+uint8_t EDITED_VALUE_NUM = 0;
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -97,20 +107,22 @@ TIM_HandleTypeDef htim3;
 /* USER CODE BEGIN PV */
 volatile uint16_t ticktock = 0;
 volatile uint16_t ADC_Data[3]; //0-Current Sensor CH7;;;; 1-TPS CH8;;;; 2-Switch;;;;
-volatile uint8_t keyValue = 5; // Состояние покоя
+volatile uint8_t OldKeyValue = 5; // Состояние покоя
 volatile int s = 0;
 volatile bool dir_current, dir_previous;
 volatile uint16_t rpm_ticks = 0, rpm = 0;
 volatile uint16_t second;
-volatile uint8_t newKeyValue = 5;
+volatile uint8_t NewKeyValue = 5;
 const uint16_t values[5] = { 0, 564, 1215, 2075, 2300 };
 const uint8_t error = 65;       // Величина отклонения от значений - погрешность
 static u8g2_t u8g2;
 uint32_t amountsent = 0;
+bool EEPROM_RECENT_WRITE = false;
 volatile uint32_t IC_Faling_Val; // Direct mode	Faling Edge Detection
 volatile uint32_t SPD_Pulse_width;
 volatile bool lowspeed = true;
 volatile bool pidloop;
+uint8_t detectlongpress[4];
 float spd;
 arm_pid_instance_f32 PID;
 int32_t pwm = 0;
@@ -122,7 +134,7 @@ struct EESTR {
 ////
 } EEPROM;
 
-float PID_P = 100, PID_I = 0.025, PID_D = 10;
+//float PID_P = 100, PID_I = 0.025, PID_D = 10;
 //float pid_error;
 float SPD_CURRENT, SPD_TARGET;
 int32_t PID_OUT_CURRENT, PID_OUT_PREVIOUS;
@@ -131,9 +143,10 @@ bool CRUISE_ARMED = false, STP = false, AT_OD = false, IDLE = true,
 uint8_t screen = 1;
 uint8_t activescreen = 0;
 const uint16_t devAddr = (0x50 << 1); // HAL expects address to be shifted one bit to the left
-const uint16_t memAddrP = 0;
-const uint16_t memAddrI = 0 + sizeof(PID_P);
-const uint16_t memAddrD = 0 + sizeof(PID_P) + sizeof(PID_I);
+//const uint16_t memAddrP = 0;
+//const uint16_t memAddrI = 0 + sizeof(PID_P);
+//const uint16_t memAddrD = 0 + sizeof(PID_P) + sizeof(PID_I);
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -152,6 +165,23 @@ static void MX_TIM3_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void SaveToEEPROM() {
+	if (!EEPROM_RECENT_WRITE) {
+		EEPROM.PID_P = PID.Kp;
+		EEPROM.PID_I = PID.Ki;
+		EEPROM.PID_D = PID.Kd;
+		uint8_t * p = (uint8_t *) &EEPROM;
+		//uint8_t const * p = (uint8_t const *) &EEPROM;
+		for (size_t i = 0, len = sizeof(EEPROM); i < sizeof(EEPROM); i +=
+		EEPROM_BLOCK_SIZE, len -= EEPROM_BLOCK_SIZE) {
+			HAL_I2C_Mem_Write(&hi2c1, devAddr, i, I2C_MEMADD_SIZE_16BIT, p + i,
+					(len > EEPROM_BLOCK_SIZE) ? EEPROM_BLOCK_SIZE : len, 1);
+			HAL_Delay(5);
+		}
+		EEPROM_RECENT_WRITE = true;
+	}
+}
+
 void setMSpeed(int32_t duty) {
 	if (duty < 0) {
 		duty = -duty;  // Make speed a positive quantity
@@ -204,38 +234,20 @@ void disarm(void) {
 
 void CheckCruiseAndDisarm(bool STP_Status, bool AT_D_Status,
 bool IDLE_Status, uint16_t RPM_Status, float SPD_Status) {
-	if (CRUISE_ARMED == true) {
-		if (STP_Status == true) {
+	if (CRUISE_ARMED == true)
+		if (STP_Status == true || AT_D_Status == false || IDLE_Status == true
+				|| RPM_Status > 3500 || SPD_Status > 130.0 || SPD_Status < 40.0)
 			disarm();
-			return;
-		}
-		if (AT_D_Status == false) {
-			disarm();
-			return;
-		}
-		if (IDLE_Status == true) {
-			disarm();
-			return;
-		}
-		if (RPM_Status > 3500) {
-			disarm();
-			return;
-		}
-		if (SPD_Status > 130.0 || SPD_Status < 40.0) {
-			disarm();
-			return;
-		}
-	}
 }
 
 void arm() {
-	if (CRUISE_ARMED == false) {
-		CRUISE_ARMED = true;
-		//включение магнитной муфты
-		HAL_GPIO_WritePin(GPIOB, PB2_OUT_SOLENOID_Pin, GPIO_PIN_SET);
-		//включение индикатора круиза
-		HAL_GPIO_WritePin(GPIOB, CRUISE_LAMP_OUT_PB15_Pin, GPIO_PIN_SET);
-	}
+	SPD_TARGET = (int) SPD_CURRENT + 0.1;
+	CRUISE_ARMED = true;
+	//включение магнитной муфты
+	HAL_GPIO_WritePin(GPIOB, PB2_OUT_SOLENOID_Pin, GPIO_PIN_SET);
+	//включение индикатора круиза
+	HAL_GPIO_WritePin(GPIOB, CRUISE_LAMP_OUT_PB15_Pin, GPIO_PIN_SET);
+	CheckCruiseAndDisarm(STP, AT_D, IDLE, rpm, SPD_CURRENT);
 }
 
 uint8_t GetButtonNumberByValue(uint16_t value) { // Новая функция по преобразованию кода нажатой кнопки в её номер
@@ -244,7 +256,7 @@ uint8_t GetButtonNumberByValue(uint16_t value) { // Новая функция п
 		if (value <= values[i] + error && value >= values[i] - error)
 			return i;
 	}
-	return 5;                     // Значение не принадлежит заданному диапазону
+	return 5;                 // Значение не принадлежит заданному диапазону
 }
 
 void readADC() {
@@ -283,35 +295,117 @@ void readGPIO() {
 		AT_OD = false;
 }
 
+void AdjustValue(uint8_t value, uint8_t action) {
+	float input_value;
+	switch (value) {
+	case PID_P: {
+		input_value = PID.Kp;
+		if (action == UP)
+			input_value += 1;
+		else
+			input_value -= 1;
+		PID.Kp = input_value;
+	}
+		break;
+	case PID_I: {
+		input_value = PID.Ki;
+		if (action == UP)
+			input_value += 0.01;
+		else
+			input_value -= 0.01;
+		PID.Ki = input_value;
+	}
+		break;
+	case PID_D: {
+		input_value = PID.Kd;
+		if (action == UP)
+			input_value += 0.01;
+		else
+			input_value -= 0.01;
+		PID.Kd = input_value;
+	}
+		break;
+	}
+}
+
 uint8_t ReadCruiseSwitch() {
-	newKeyValue = GetButtonNumberByValue(ADC_Data[Switch_Data]);
-	if (keyValue != newKeyValue) {
-		keyValue = newKeyValue;
-		switch (keyValue) {
-		case 0:       //ON-OFF
-		{
-			SPD_TARGET = (int) SPD_CURRENT + 0.1;
-			if (CRUISE_ARMED)
+	NewKeyValue = GetButtonNumberByValue(ADC_Data[Switch_Data]);
+	//OldKeyValue 1
+	//NewKeyValue 5
+	//detectlongpress[1]=21
+	//Поиск долгого нажатия клавиши, больше 2х секунд
+	if (OldKeyValue == NewKeyValue && NewKeyValue != 5)
+		detectlongpress[NewKeyValue] += 1;
+	//Обработка нажатой клавиши в момент ее отпускания. Одновременно с проверкой на долгое нажатие.
+	if (OldKeyValue != NewKeyValue && NewKeyValue == 5) {
+		switch (OldKeyValue) {
+		case 0: {
+			//кнопка ON-OFF
+			//При нажатии на главном экране включается-отключается круиз
+			//При нажатии на экране настроек переключается настраиваемый параметр.
+			if (detectlongpress[OldKeyValue] > LONG_PRESS_DURATION) {
+				//долгое нажание на ON-OFF
+				if (screen == 0) {
+					//долгое нажание на экране тюна пидов - сохранение их в еепром единоразово. После этого
+					//возможность сохранения блокируется до тех пор пока не перейдешь на главный экран
+					//с целью исключения износа EEPROM
+					SaveToEEPROM();
+				}
+				detectlongpress[OldKeyValue] = 0;
+			}
+			OldKeyValue = NewKeyValue;
+			if (CRUISE_ARMED && screen == 1)
+				//отключение круиза
 				disarm();
-			else
+			else if (!CRUISE_ARMED && screen == 1) {
+				//включение круиза
 				arm();
+			} else if (screen == 0) {
+				//на экране настроек переключается настраиваемый параметр.
+				if (EDITED_VALUE_NUM != PID_D)
+					EDITED_VALUE_NUM++;
+				else
+					EDITED_VALUE_NUM = 0;
+			}
 		}
 			break;
 		case 1:       //RES
 		{
-			if (CRUISE_ARMED)
+			if (detectlongpress[OldKeyValue] > LONG_PRESS_DURATION) {
+				//длинное нажание на RES
+				detectlongpress[OldKeyValue] = 0;
+			}
+			OldKeyValue = NewKeyValue;
+			if (CRUISE_ARMED && screen == 1)
 				SPD_TARGET += 10;
+			else if (screen == 0) {
+				AdjustValue(EDITED_VALUE_NUM, UP);
+			}
 		}
 			break;
 		case 2:       //SET
 		{
-			if (CRUISE_ARMED)
+			if (detectlongpress[OldKeyValue] > LONG_PRESS_DURATION) {
+				//длинное нажание на SET
+				detectlongpress[OldKeyValue] = 0;
+			}
+			OldKeyValue = NewKeyValue;
+			//На основном экране уменьшение желаемой скорости
+			if (CRUISE_ARMED && screen == 1)
 				SPD_TARGET -= 10;
+			//на нулевом экране - коррекция текущего параметра вниз
+			else if (screen == 0) {
+				AdjustValue(EDITED_VALUE_NUM, DOWN);
+			}
 		}
 			break;
 		case 3:       //CANCEL
 		{
-			pwm += 20;
+			if (detectlongpress[OldKeyValue] > LONG_PRESS_DURATION) {
+				//длинное нажание на cancel
+				detectlongpress[OldKeyValue] = 0;
+			}
+			OldKeyValue = NewKeyValue;
 			screen++;
 			if (screen == 2)
 				screen = 0;
@@ -319,10 +413,15 @@ uint8_t ReadCruiseSwitch() {
 		}
 			break;
 		case 5:       //NO PRESSED
+		{
+			OldKeyValue = NewKeyValue;
+		}
 			break;
 		}
-	}
-	return keyValue;
+
+	} else
+		OldKeyValue = NewKeyValue;
+	return OldKeyValue;
 }
 
 uint8_t u8x8_gpio_and_delay_mine(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,
@@ -398,7 +497,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 
 }
-
+void CalculateRPM() {
+	if (second == 10) {
+		rpm = rpm_ticks * 40;
+		second = 0;
+		rpm_ticks = 0;
+		pwm += 50;
+		if (pwm > 1000)
+			pwm = 0;
+	}
+}
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM1) {
 		//прерывание каждые 100мс
@@ -409,15 +517,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		ticktock++;
 		second++;
 		pidloop = true;
-		if (second == 10) {
-			rpm = rpm_ticks * 40;
-			second = 0;
-			rpm_ticks = 0;
-			pwm += 50;
-			if (pwm > 1000)
-				pwm = 0;
-		}
-
+		CalculateRPM();
 	}
 	if (htim->Instance == TIM3) {
 		lowspeed = true; //если переполнился счетчик таймера спидометра - значит слишком медленная скорость
@@ -436,9 +536,25 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 void showpage(uint8_t page) {
 	char tmp_string[6];
 	switch (page) {
-	case 0:
+	case 0: {
+		u8g2_FirstPage(&u8g2);
+		do {
+			u8g2_SetFont(&u8g2, u8g2_font_artossans8_8u);
+			u8g2_DrawStr(&u8g2, 0, font_h, "P");
+			u8g2_DrawStr(&u8g2, 0, font_h * 2, "I");
+			u8g2_DrawStr(&u8g2, 0, font_h * 3, "D");
+			u8g2_DrawStr(&u8g2, font_w, font_h * (EDITED_VALUE_NUM + 1), "->");
+			ftoa(EEPROM.PID_P, tmp_string, 1);
+			u8g2_DrawStr(&u8g2, font_w * 3, font_h, tmp_string);
+			ftoa(EEPROM.PID_I, tmp_string, 1);
+			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 2, tmp_string);
+			ftoa(EEPROM.PID_D, tmp_string, 1);
+			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 3, tmp_string);
+		} while (u8g2_NextPage(&u8g2));
+	}
 		break;
 	case 1: {
+		EEPROM_RECENT_WRITE = false;
 		u8g2_FirstPage(&u8g2);
 		do {
 			u8g2_SetFont(&u8g2, u8g2_font_artossans8_8u);
@@ -464,19 +580,23 @@ void showpage(uint8_t page) {
 			if (STP == true)
 				u8g2_DrawBox(&u8g2, font_w * 3, font_h * 5, font_w, font_h);
 			else
-				u8g2_DrawFrame(&u8g2, font_w * 3, font_h * 5, font_w, font_h);
+				u8g2_DrawFrame(&u8g2, font_w * 3, font_h * 5, font_w,
+				font_h);
 			if (IDLE == true)
 				u8g2_DrawBox(&u8g2, font_w * 3, font_h * 6, font_w, font_h);
 			else
-				u8g2_DrawFrame(&u8g2, font_w * 3, font_h * 6, font_w, font_h);
+				u8g2_DrawFrame(&u8g2, font_w * 3, font_h * 6, font_w,
+				font_h);
 			if (AT_D == true)
 				u8g2_DrawBox(&u8g2, font_w * 3, font_h * 7, font_w, font_h);
 			else
-				u8g2_DrawFrame(&u8g2, font_w * 3, font_h * 7, font_w, font_h);
+				u8g2_DrawFrame(&u8g2, font_w * 3, font_h * 7, font_w,
+				font_h);
 			if (AT_OD == true)
 				u8g2_DrawBox(&u8g2, font_w * 8, font_h * 5, font_w, font_h);
 			else
-				u8g2_DrawFrame(&u8g2, font_w * 8, font_h * 5, font_w, font_h);
+				u8g2_DrawFrame(&u8g2, font_w * 8, font_h * 5, font_w,
+				font_h);
 		} while (u8g2_NextPage(&u8g2));
 	}
 		break;
@@ -533,9 +653,9 @@ int main(void) {
 	u8g2_SetPowerSave(&u8g2, 0); // wake up display
 
 	/*
-	 EEPROM.PID_P=0.1;
-	 EEPROM.PID_I=0.001;
-	 EEPROM.PID_D=0.0001;
+	 EEPROM.PID_P=100;
+	 EEPROM.PID_I=0.025;
+	 EEPROM.PID_D=10;
 	 uint8_t const * p = (uint8_t const *)&EEPROM;
 	 for(size_t i = 0, len = sizeof(EEPROM); i < sizeof(EEPROM); i += EEPROM_BLOCK_SIZE, len -= EEPROM_BLOCK_SIZE) {
 	 HAL_I2C_Mem_Write(&hi2c1, devAddr, i, I2C_MEMADD_SIZE_16BIT, p + i, (len > EEPROM_BLOCK_SIZE) ? EEPROM_BLOCK_SIZE : len, 1);
@@ -552,11 +672,13 @@ int main(void) {
 				(len > EEPROM_BLOCK_SIZE) ? EEPROM_BLOCK_SIZE : len, 1);
 	}
 
-	PID.Kp = PID_P; /* Proporcional */
-	PID.Ki = PID_I; /* Integral */
-	PID.Kd = PID_D; /* Derivative */
-	arm_pid_init_f32(&PID, 1);
+	PID.Kp = EEPROM.PID_P; /* Proporcional */
+	PID.Ki = EEPROM.PID_I; /* Integral */
+	PID.Kd = EEPROM.PID_D; /* Derivative */
 
+	arm_pid_init_f32(&PID, 1);
+	for (uint8_t i = 0; i < 4; i++)
+		detectlongpress[i] = 0;
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
