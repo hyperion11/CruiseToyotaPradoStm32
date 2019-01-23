@@ -140,7 +140,7 @@ float SPD_CURRENT, SPD_TARGET;
 int32_t PID_OUT_CURRENT, PID_OUT_PREVIOUS;
 bool CRUISE_ARMED = false, STP = false, AT_OD = false, IDLE = true,
 		AT_D = false;
-uint8_t screen = 1;
+volatile uint8_t screen = 1;
 uint8_t activescreen = 0;
 const uint16_t devAddr = (0x50 << 1); // HAL expects address to be shifted one bit to the left
 //const uint16_t memAddrP = 0;
@@ -176,7 +176,7 @@ void SaveToEEPROM() {
 		EEPROM_BLOCK_SIZE, len -= EEPROM_BLOCK_SIZE) {
 			HAL_I2C_Mem_Write(&hi2c1, devAddr, i, I2C_MEMADD_SIZE_16BIT, p + i,
 					(len > EEPROM_BLOCK_SIZE) ? EEPROM_BLOCK_SIZE : len, 1);
-			HAL_Delay(5);
+
 		}
 		EEPROM_RECENT_WRITE = true;
 	}
@@ -200,19 +200,19 @@ void setMSpeed(int32_t duty) {
 				GPIO_PIN_RESET);
 	} else if (dir_current == CV) {
 		//пауза в случае реверса мотора
-		if (dir_current != dir_previous) {
-			HAL_Delay(50);
-			dir_previous = dir_current;
-		}
+	//	if (dir_current != dir_previous) {
+		//	HAL_Delay(50);
+	//		dir_previous = dir_current;
+	//	}
 		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INA_Pin,
 				GPIO_PIN_SET);
 		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INB_Pin,
 				GPIO_PIN_RESET);
 	} else if (dir_current == CCV) {
-		if (dir_current != dir_previous) {
-			HAL_Delay(50);
-			dir_previous = dir_current;
-		}
+		//if (dir_current != dir_previous) {
+		//	HAL_Delay(50);
+		//	dir_previous = dir_current;
+		//}
 		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INA_Pin,
 				GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INB_Pin,
@@ -223,7 +223,7 @@ void setMSpeed(int32_t duty) {
 void disarm(void) {
 	CRUISE_ARMED = false;
 	//отключение магнитной муфты
-	HAL_GPIO_WritePin(GPIOB, PB2_OUT_SOLENOID_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, PB10_OUT_SOLENOID_Pin, GPIO_PIN_RESET);
 	//отключение индикатора круиза
 	HAL_GPIO_WritePin(GPIOB, CRUISE_LAMP_OUT_PB15_Pin, GPIO_PIN_RESET);
 	//останов привода круиза
@@ -234,17 +234,16 @@ void disarm(void) {
 
 void CheckCruiseAndDisarm(bool STP_Status, bool AT_D_Status,
 bool IDLE_Status, uint16_t RPM_Status, float SPD_Status) {
-	if (CRUISE_ARMED == true)
-		if (STP_Status == true || AT_D_Status == false || IDLE_Status == true
-				|| RPM_Status > 3500 || SPD_Status > 130.0 || SPD_Status < 40.0)
-			disarm();
+	//if (CRUISE_ARMED == true)
+	//if (STP_Status == true || AT_D_Status == false || IDLE_Status == true	|| RPM_Status > 3500 || SPD_Status > 130.0 || SPD_Status < 40.0)
+	//disarm();
 }
 
 void arm() {
 	SPD_TARGET = (int) SPD_CURRENT + 0.1;
 	CRUISE_ARMED = true;
 	//включение магнитной муфты
-	HAL_GPIO_WritePin(GPIOB, PB2_OUT_SOLENOID_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, PB10_OUT_SOLENOID_Pin, GPIO_PIN_SET);
 	//включение индикатора круиза
 	HAL_GPIO_WritePin(GPIOB, CRUISE_LAMP_OUT_PB15_Pin, GPIO_PIN_SET);
 	CheckCruiseAndDisarm(STP, AT_D, IDLE, rpm, SPD_CURRENT);
@@ -350,8 +349,10 @@ uint8_t ReadCruiseSwitch() {
 					//возможность сохранения блокируется до тех пор пока не перейдешь на главный экран
 					//с целью исключения износа EEPROM
 					SaveToEEPROM();
+
 				}
 				detectlongpress[OldKeyValue] = 0;
+				break;
 			}
 			OldKeyValue = NewKeyValue;
 			if (CRUISE_ARMED && screen == 1)
@@ -516,6 +517,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		ReadCruiseSwitch();
 		ticktock++;
 		second++;
+		if (CRUISE_ARMED) {
+			pid_error = SPD_CURRENT - SPD_TARGET;
+			PID_OUT_CURRENT = (int) arm_pid_f32(&PID, pid_error);
+			setMSpeed(PID_OUT_CURRENT);
+		}
 		pidloop = true;
 		CalculateRPM();
 	}
@@ -544,11 +550,11 @@ void showpage(uint8_t page) {
 			u8g2_DrawStr(&u8g2, 0, font_h * 2, "I");
 			u8g2_DrawStr(&u8g2, 0, font_h * 3, "D");
 			u8g2_DrawStr(&u8g2, font_w, font_h * (EDITED_VALUE_NUM + 1), "->");
-			ftoa(EEPROM.PID_P, tmp_string, 1);
+			ftoa(PID.Kp, tmp_string, 3);
 			u8g2_DrawStr(&u8g2, font_w * 3, font_h, tmp_string);
-			ftoa(EEPROM.PID_I, tmp_string, 1);
+			ftoa(PID.Ki, tmp_string, 3);
 			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 2, tmp_string);
-			ftoa(EEPROM.PID_D, tmp_string, 1);
+			ftoa(PID.Kd, tmp_string, 3);
 			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 3, tmp_string);
 		} while (u8g2_NextPage(&u8g2));
 	}
@@ -695,15 +701,16 @@ int main(void) {
 			lowspeed = false;
 		}
 
-		if (CRUISE_ARMED && pidloop) {
-			pid_error = SPD_CURRENT - SPD_TARGET;
-			PID_OUT_CURRENT = (int) arm_pid_f32(&PID, pid_error);
-			if (PID_OUT_CURRENT != PID_OUT_PREVIOUS) {
-				setMSpeed(PID_OUT_CURRENT);
-				PID_OUT_PREVIOUS = PID_OUT_CURRENT;
-			}
-			pidloop = false;
-		}
+		/*if (CRUISE_ARMED && pidloop) {
+		 pid_error = SPD_CURRENT - SPD_TARGET;
+		 PID_OUT_CURRENT = (int) arm_pid_f32(&PID, pid_error);
+		 if (PID_OUT_CURRENT != PID_OUT_PREVIOUS) {
+		 setMSpeed(PID_OUT_CURRENT);
+		 PID_OUT_PREVIOUS = PID_OUT_CURRENT;
+		 }
+		 pidloop = false;
+		 }
+		 */
 		if (ticktock >= 4) {
 			showpage(screen);
 			ticktock = 0;
@@ -1104,7 +1111,7 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOB,
-			PB2_OUT_SOLENOID_Pin | OD_OUT_BUTTON_PB13_Pin
+			TB6612FNG_STB_Pin | PB10_OUT_SOLENOID_Pin | OD_OUT_BUTTON_PB13_Pin
 					| CRUISE_LAMP_OUT_PB15_Pin | VNH2_SP30_INA_Pin
 					| VNH2_SP30_INB_Pin, GPIO_PIN_RESET);
 
@@ -1130,19 +1137,14 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 	HAL_GPIO_Init(STOP_IN_PA3_GPIO_Port, &GPIO_InitStruct);
 
-	/*Configure GPIO pins : PB2_OUT_SOLENOID_Pin OD_OUT_BUTTON_PB13_Pin CRUISE_LAMP_OUT_PB15_Pin VNH2_SP30_INA_Pin
-	 VNH2_SP30_INB_Pin */
-	GPIO_InitStruct.Pin = PB2_OUT_SOLENOID_Pin | OD_OUT_BUTTON_PB13_Pin
-			| CRUISE_LAMP_OUT_PB15_Pin | VNH2_SP30_INA_Pin | VNH2_SP30_INB_Pin;
+	/*Configure GPIO pins : TB6612FNG_STB_Pin PB10_OUT_SOLENOID_Pin OD_OUT_BUTTON_PB13_Pin CRUISE_LAMP_OUT_PB15_Pin
+	 VNH2_SP30_INA_Pin VNH2_SP30_INB_Pin */
+	GPIO_InitStruct.Pin = TB6612FNG_STB_Pin | PB10_OUT_SOLENOID_Pin
+			| OD_OUT_BUTTON_PB13_Pin | CRUISE_LAMP_OUT_PB15_Pin
+			| VNH2_SP30_INA_Pin | VNH2_SP30_INB_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-	/*Configure GPIO pins : VNH2_SP30_EN_Pin OD_IN_LIGHT_PB12_Pin */
-	GPIO_InitStruct.Pin = VNH2_SP30_EN_Pin | OD_IN_LIGHT_PB12_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 	/*Configure GPIO pin : RPM_EXTI11_Pin */
@@ -1150,6 +1152,12 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
 	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 	HAL_GPIO_Init(RPM_EXTI11_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : OD_IN_LIGHT_PB12_Pin */
+	GPIO_InitStruct.Pin = OD_IN_LIGHT_PB12_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+	HAL_GPIO_Init(OD_IN_LIGHT_PB12_GPIO_Port, &GPIO_InitStruct);
 
 	/*Configure GPIO pin : IDLE_IN_PB14_Pin */
 	GPIO_InitStruct.Pin = IDLE_IN_PB14_Pin;
