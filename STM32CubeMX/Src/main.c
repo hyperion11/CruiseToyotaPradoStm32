@@ -182,37 +182,37 @@ void SaveToEEPROM() {
 	}
 }
 
-void setMSpeed(int32_t duty) {
-	if (duty < 0) {
-		duty = -duty;  // Make speed a positive quantity
+void setMSpeed(int32_t duty_in) {
+	uint16_t duty_out;
+	if (duty_in < 0) {
+		duty_out = -duty_in;  // Make speed a positive quantity
 		dir_current = CCV;  // Preserve the direction
-	} else
+	} else {
 		dir_current = CV;
-	if (duty > 899)  // Max PWM dutycycle
-		duty = 899;
-	if (duty < 50)
-		duty = 0; //меньше 50 нет вращения мотора
-	TIM2->CCR1 = duty;
-	if (duty == 0) {
+		duty_out = duty_in;
+	}
+
+	if (duty_out < 2)
+		duty_out = 0; //меньше 2 нет вращения мотора
+	else
+		//оффсет 100pwm иначе мотор не вращается совсем
+		duty_out += 100;
+	if (duty_out > 899)  // Max PWM dutycycle
+		duty_out = 899;
+	if (duty_out == 0) {
+		TIM2->CCR1 = duty_out;
 		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INA_Pin,
 				GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INB_Pin,
 				GPIO_PIN_RESET);
 	} else if (dir_current == CV) {
-		//пауза в случае реверса мотора
-	//	if (dir_current != dir_previous) {
-		//	HAL_Delay(50);
-	//		dir_previous = dir_current;
-	//	}
+		TIM2->CCR1 = duty_out;
 		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INA_Pin,
 				GPIO_PIN_SET);
 		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INB_Pin,
 				GPIO_PIN_RESET);
 	} else if (dir_current == CCV) {
-		//if (dir_current != dir_previous) {
-		//	HAL_Delay(50);
-		//	dir_previous = dir_current;
-		//}
+		TIM2->CCR1 = duty_out;
 		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INA_Pin,
 				GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INB_Pin,
