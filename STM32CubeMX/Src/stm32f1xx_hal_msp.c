@@ -444,8 +444,8 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     PA0-WKUP     ------> TIM2_CH1 
     */
     GPIO_InitStruct.Pin = VNH2_SP30_PWM_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(VNH2_SP30_PWM_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN TIM2_MspPostInit 1 */

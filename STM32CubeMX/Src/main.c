@@ -71,8 +71,6 @@
 #define Current_Data 0
 #define TPS_Data 1
 #define Switch_Data 2
-#define CCV 0
-#define CV 1
 #define font_w 9
 #define font_h 8
 #define LONG_PRESS_DURATION 20 //20x100ms-100мс время опроса рычага. 2секунды на распознание долгого нажания
@@ -82,6 +80,10 @@ enum ACTION {
 enum EDITED_VALUE {
 	PID_P, PID_I, PID_D
 };
+enum DIR {
+	CV, CCV, STOP
+};
+
 uint8_t EDITED_VALUE_NUM = 0;
 
 /* USER CODE END PD */
@@ -109,7 +111,7 @@ volatile uint16_t ticktock = 0;
 volatile uint16_t ADC_Data[3]; //0-Current Sensor CH7;;;; 1-TPS CH8;;;; 2-Switch;;;;
 volatile uint8_t OldKeyValue = 5; // Состояние покоя
 volatile int s = 0;
-volatile bool dir_current, dir_previous;
+
 volatile uint16_t rpm_ticks = 0, rpm = 0;
 volatile uint16_t second;
 volatile uint8_t NewKeyValue = 5;
@@ -123,9 +125,9 @@ volatile uint32_t SPD_Pulse_width;
 volatile bool lowspeed = true;
 volatile bool pidloop;
 uint8_t detectlongpress[4];
-float spd;
+
 arm_pid_instance_f32 PID;
-int32_t pwm = 0;
+
 volatile float pid_error;
 struct EESTR {
 	float PID_P;
@@ -134,12 +136,18 @@ struct EESTR {
 ////
 } EEPROM;
 
-//float PID_P = 100, PID_I = 0.025, PID_D = 10;
-//float pid_error;
+struct CRUISESTR {
+	bool ARMED;
+	bool THR_MOVING;
+	uint32_t MOVE_TIME_START;
+	uint32_t MOVE_TIME_CURRENT;
+	int8_t MOVE_TIME;
+	uint8_t DIR;
+	int32_t PID_OUT;
+////
+} CRUISE;
 float SPD_CURRENT, SPD_TARGET;
-int32_t PID_OUT_CURRENT, PID_OUT_PREVIOUS;
-bool CRUISE_ARMED = false, STP = false, AT_OD = false, IDLE = true,
-		AT_D = false;
+bool STP = false, AT_OD = false, IDLE = true, AT_D = false;
 volatile uint8_t screen = 1;
 uint8_t activescreen = 0;
 const uint16_t devAddr = (0x50 << 1); // HAL expects address to be shifted one bit to the left
@@ -182,66 +190,51 @@ void SaveToEEPROM() {
 	}
 }
 
-void setMSpeed(int32_t duty) {
-	if (duty < 0) {
-		duty = -duty;  // Make speed a positive quantity
-		dir_current = CCV;  // Preserve the direction
-	} else
-		dir_current = CV;
-	if (duty > 899)  // Max PWM dutycycle
-		duty = 899;
-	if (duty < 50)
-		duty = 0; //меньше 50 нет вращения мотора
-	TIM2->CCR1 = duty;
-	if (duty == 0) {
+void move_throttle(uint8_t dir) {
+	if (dir == STOP) {
+		TIM2->CCR1 = 0;
 		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INA_Pin,
 				GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INB_Pin,
 				GPIO_PIN_RESET);
-	} else if (dir_current == CV) {
-		//пауза в случае реверса мотора
-	//	if (dir_current != dir_previous) {
-		//	HAL_Delay(50);
-	//		dir_previous = dir_current;
-	//	}
+	} else if (dir == CV) {
 		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INA_Pin,
 				GPIO_PIN_SET);
 		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INB_Pin,
 				GPIO_PIN_RESET);
-	} else if (dir_current == CCV) {
-		//if (dir_current != dir_previous) {
-		//	HAL_Delay(50);
-		//	dir_previous = dir_current;
-		//}
+		TIM2->CCR1 = 450;
+	} else if (dir == CCV) {
 		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INA_Pin,
 				GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INB_Pin,
 				GPIO_PIN_SET);
+		TIM2->CCR1 = 450;
 	}
+
 }
 
 void disarm(void) {
-	CRUISE_ARMED = false;
+	CRUISE.ARMED = false;
 	//отключение магнитной муфты
 	HAL_GPIO_WritePin(GPIOB, PB10_OUT_SOLENOID_Pin, GPIO_PIN_RESET);
 	//отключение индикатора круиза
 	HAL_GPIO_WritePin(GPIOB, CRUISE_LAMP_OUT_PB15_Pin, GPIO_PIN_RESET);
 	//останов привода круиза
-	setMSpeed(0);
+	//setMSpeed(0);
 	arm_pid_reset_f32(&PID);
 
 }
 
 void CheckCruiseAndDisarm(bool STP_Status, bool AT_D_Status,
 bool IDLE_Status, uint16_t RPM_Status, float SPD_Status) {
-	//if (CRUISE_ARMED == true)
+	//if (CRUISE.ARMED == true)
 	//if (STP_Status == true || AT_D_Status == false || IDLE_Status == true	|| RPM_Status > 3500 || SPD_Status > 130.0 || SPD_Status < 40.0)
 	//disarm();
 }
 
 void arm() {
 	SPD_TARGET = (int) SPD_CURRENT + 0.1;
-	CRUISE_ARMED = true;
+	CRUISE.ARMED = true;
 	//включение магнитной муфты
 	HAL_GPIO_WritePin(GPIOB, PB10_OUT_SOLENOID_Pin, GPIO_PIN_SET);
 	//включение индикатора круиза
@@ -355,10 +348,10 @@ uint8_t ReadCruiseSwitch() {
 				break;
 			}
 			OldKeyValue = NewKeyValue;
-			if (CRUISE_ARMED && screen == 1)
+			if (CRUISE.ARMED && screen == 1)
 				//отключение круиза
 				disarm();
-			else if (!CRUISE_ARMED && screen == 1) {
+			else if (!CRUISE.ARMED && screen == 1) {
 				//включение круиза
 				arm();
 			} else if (screen == 0) {
@@ -377,7 +370,7 @@ uint8_t ReadCruiseSwitch() {
 				detectlongpress[OldKeyValue] = 0;
 			}
 			OldKeyValue = NewKeyValue;
-			if (CRUISE_ARMED && screen == 1)
+			if (CRUISE.ARMED && screen == 1)
 				SPD_TARGET += 10;
 			else if (screen == 0) {
 				AdjustValue(EDITED_VALUE_NUM, UP);
@@ -392,7 +385,7 @@ uint8_t ReadCruiseSwitch() {
 			}
 			OldKeyValue = NewKeyValue;
 			//На основном экране уменьшение желаемой скорости
-			if (CRUISE_ARMED && screen == 1)
+			if (CRUISE.ARMED && screen == 1)
 				SPD_TARGET -= 10;
 			//на нулевом экране - коррекция текущего параметра вниз
 			else if (screen == 0) {
@@ -503,9 +496,6 @@ void CalculateRPM() {
 		rpm = rpm_ticks * 40;
 		second = 0;
 		rpm_ticks = 0;
-		pwm += 50;
-		if (pwm > 1000)
-			pwm = 0;
 	}
 }
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
@@ -517,12 +507,27 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		ReadCruiseSwitch();
 		ticktock++;
 		second++;
-		if (CRUISE_ARMED) {
+		if (CRUISE.ARMED) {
 			pid_error = SPD_CURRENT - SPD_TARGET;
-			PID_OUT_CURRENT = (int) arm_pid_f32(&PID, pid_error);
-			setMSpeed(PID_OUT_CURRENT);
+			CRUISE.PID_OUT = (int) arm_pid_f32(&PID, pid_error);
+			//если результат пида отрицательный до включается реверс, а сама переменная становится положительной
+			if (CRUISE.PID_OUT == 0) {
+				CRUISE.MOVE_TIME = 0;
+				CRUISE.DIR = STOP;
+			} else if (CRUISE.PID_OUT < 0) {
+				CRUISE.MOVE_TIME = -CRUISE.PID_OUT;
+				CRUISE.DIR = CCV;
+			} else {
+				CRUISE.MOVE_TIME = CRUISE.PID_OUT;
+				CRUISE.DIR = CV;
+			}
+			//Управление мотором каждые 100мс
+			//длительность импульса максимум 99мс
+			if (CRUISE.MOVE_TIME > 99)
+				CRUISE.MOVE_TIME = 99;
+			CRUISE.THR_MOVING = true;
+			CRUISE.MOVE_TIME_START = HAL_GetTick();
 		}
-		pidloop = true;
 		CalculateRPM();
 	}
 	if (htim->Instance == TIM3) {
@@ -573,7 +578,7 @@ void showpage(uint8_t page) {
 			u8g2_DrawStr(&u8g2, 0, font_h * 7, "IDL");
 			u8g2_DrawStr(&u8g2, 0, font_h * 8, "ATD");
 			u8g2_DrawStr(&u8g2, font_w * 5, font_h * 6, "ATO");
-			itoa(PID_OUT_CURRENT, tmp_string, 10);
+			itoa(CRUISE.PID_OUT, tmp_string, 10);
 			u8g2_DrawStr(&u8g2, font_w * 3, font_h, tmp_string);
 			itoa((int) (SPD_CURRENT + 0.1), tmp_string, 10);
 			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 2, tmp_string);
@@ -629,7 +634,11 @@ int main(void) {
 	HAL_Init();
 
 	/* USER CODE BEGIN Init */
-
+	CRUISE.ARMED = false;
+	CRUISE.MOVE_TIME = 0;
+	CRUISE.MOVE_TIME_CURRENT = 0;
+	CRUISE.MOVE_TIME_START = 0;
+	CRUISE.THR_MOVING = false;
 	/* USER CODE END Init */
 
 	/* Configure the system clock */
@@ -701,16 +710,20 @@ int main(void) {
 			lowspeed = false;
 		}
 
-		/*if (CRUISE_ARMED && pidloop) {
-		 pid_error = SPD_CURRENT - SPD_TARGET;
-		 PID_OUT_CURRENT = (int) arm_pid_f32(&PID, pid_error);
-		 if (PID_OUT_CURRENT != PID_OUT_PREVIOUS) {
-		 setMSpeed(PID_OUT_CURRENT);
-		 PID_OUT_PREVIOUS = PID_OUT_CURRENT;
-		 }
-		 pidloop = false;
-		 }
-		 */
+		if (CRUISE.ARMED) {
+			if (CRUISE.THR_MOVING) {
+				CRUISE.MOVE_TIME_CURRENT = HAL_GetTick();
+				if (CRUISE.MOVE_TIME_CURRENT
+						<= CRUISE.MOVE_TIME_START + abs(CRUISE.MOVE_TIME)) {
+					move_throttle(CRUISE.DIR);
+				} else {
+					move_throttle(STOP);
+					CRUISE.THR_MOVING = false;
+				}
+			}
+
+		}
+
 		if (ticktock >= 4) {
 			showpage(screen);
 			ticktock = 0;
