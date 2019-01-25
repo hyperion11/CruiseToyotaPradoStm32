@@ -74,6 +74,7 @@
 #define font_w 9
 #define font_h 8
 #define LONG_PRESS_DURATION 20 //20x100ms-100мс время опроса рычага. 2секунды на распознание долгого нажания
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 enum ACTION {
 	UP, DOWN
 };
@@ -506,22 +507,18 @@ void CalculateRPM() {
 }
 void PIDLoop() {
 	pid_error = SPD.CURRENT - SPD.TARGET;
-	CRUISE.PID_OUT = (int) arm_pid_f32(&PID, pid_error);
+	CRUISE.PID_OUT = constrain((int ) arm_pid_f32(&PID, pid_error), -20, 20);
 	//если результат пида отрицательный до включается реверс, а сама переменная становится положительной
 	//Управление мотором каждые 500мс
 	//длительность импульса максимум 20мс
+
 	if (CRUISE.PID_OUT == 0) {
 		CRUISE.DIR = STOP;
 	} else if (CRUISE.PID_OUT < 0) {
-		if (CRUISE.PID_OUT < -20)
-			CRUISE.PID_OUT = 20;
 		CRUISE.MOVE_TIME_END = HAL_GetTick() + CRUISE.PID_OUT;
 		CRUISE.DIR = CCV;
 	} else {
-		if (CRUISE.PID_OUT > 20)
-			CRUISE.PID_OUT = 20;
-		CRUISE.MOVE_TIME_END = HAL_GetTick();
-		+CRUISE.PID_OUT;
+		CRUISE.MOVE_TIME_END = HAL_GetTick() + CRUISE.PID_OUT;
 		CRUISE.DIR = CV;
 	}
 	CRUISE.THR_MOVING = true;
@@ -535,7 +532,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		ReadCruiseSwitch();
 		GUI_counter++; //Счетчик для отображения информации на экране
 		CRUISE.tick++; //Счетчик цикла PID регуляции todo: 500мс пока что
-		if (CRUISE.ARMED && CRUISE.tick == 5){
+		if (CRUISE.ARMED && CRUISE.tick == 5) {
 			CRUISE.tick = 0;
 			CalculateSPEED();
 			PIDLoop();
