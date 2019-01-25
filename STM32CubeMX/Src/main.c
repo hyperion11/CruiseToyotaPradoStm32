@@ -121,8 +121,6 @@ static u8g2_t u8g2;
 uint32_t amountsent = 0;
 bool EEPROM_RECENT_WRITE = false;
 volatile uint32_t IC_Faling_Val; // Direct mode	Faling Edge Detection
-volatile uint32_t SPD_Pulse_width;
-volatile bool lowspeed = true;
 volatile bool pidloop;
 uint8_t detectlongpress[4];
 
@@ -145,9 +143,17 @@ struct CRUISESTR {
 	uint8_t DIR;
 	int32_t PID_OUT;
 	uint8_t tick;
-////
 } CRUISE;
-float SPD_CURRENT, SPD_TARGET;
+
+struct SPDSTR {
+	float CURRENT;
+	float TARGET;
+	float Pulse_width_avg;
+	volatile uint32_t Pulse_width;
+	volatile bool lowspeed;
+	uint16_t index;
+
+} SPD;
 bool STP = false, AT_OD = false, IDLE = true, AT_D = false;
 volatile uint8_t screen = 1;
 uint8_t activescreen = 0;
@@ -211,7 +217,6 @@ void move_throttle(uint8_t dir) {
 				GPIO_PIN_SET);
 		TIM2->CCR1 = 450;
 	}
-
 }
 
 void disarm(void) {
@@ -234,13 +239,13 @@ bool IDLE_Status, uint16_t RPM_Status, float SPD_Status) {
 }
 
 void arm() {
-	SPD_TARGET = (int) SPD_CURRENT + 0.1;
+	SPD.TARGET = (int) SPD.CURRENT + 0.1;
 	CRUISE.ARMED = true;
 	//включение магнитной муфты
 	HAL_GPIO_WritePin(GPIOB, PB10_OUT_SOLENOID_Pin, GPIO_PIN_SET);
 	//включение индикатора круиза
 	HAL_GPIO_WritePin(GPIOB, CRUISE_LAMP_OUT_PB15_Pin, GPIO_PIN_SET);
-	CheckCruiseAndDisarm(STP, AT_D, IDLE, rpm, SPD_CURRENT);
+	CheckCruiseAndDisarm(STP, AT_D, IDLE, rpm, SPD.CURRENT);
 }
 
 uint8_t GetButtonNumberByValue(uint16_t value) { // Новая функция по преобразованию кода нажатой кнопки в её номер
@@ -372,7 +377,7 @@ uint8_t ReadCruiseSwitch() {
 			}
 			OldKeyValue = NewKeyValue;
 			if (CRUISE.ARMED && screen == 1)
-				SPD_TARGET += 10;
+				SPD.TARGET += 10;
 			else if (screen == 0) {
 				AdjustValue(EDITED_VALUE_NUM, UP);
 			}
@@ -387,7 +392,7 @@ uint8_t ReadCruiseSwitch() {
 			OldKeyValue = NewKeyValue;
 			//На основном экране уменьшение желаемой скорости
 			if (CRUISE.ARMED && screen == 1)
-				SPD_TARGET -= 10;
+				SPD.TARGET -= 10;
 			//на нулевом экране - коррекция текущего параметра вниз
 			else if (screen == 0) {
 				AdjustValue(EDITED_VALUE_NUM, DOWN);
@@ -399,6 +404,7 @@ uint8_t ReadCruiseSwitch() {
 			if (detectlongpress[OldKeyValue] > LONG_PRESS_DURATION) {
 				//длинное нажание на cancel
 				detectlongpress[OldKeyValue] = 0;
+				break;
 			}
 			OldKeyValue = NewKeyValue;
 			screen++;
@@ -492,6 +498,22 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 
 }
+void CalculateSPEED() {
+	//Скорость усредняется
+	SPD.Pulse_width_avg=SPD.Pulse_width/SPD.index;
+	SPD.Pulse_width=0;
+	SPD.index=0;
+	if (SPD.Pulse_width_avg > 300000 || SPD.Pulse_width_avg < 1000) {
+		SPD.lowspeed = true;
+		SPD.Pulse_width_avg = 0;
+		SPD.CURRENT = 0;
+	} else {
+		SPD.CURRENT = 600.0 / (SPD.Pulse_width_avg / 1000.0);
+		SPD.lowspeed = false;
+	}
+
+}
+
 void CalculateRPM() {
 	if (second == 10) {
 		rpm = rpm_ticks * 40;
@@ -503,7 +525,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM1) {
 		//прерывание каждые 100мс
 		readGPIO();
-		CheckCruiseAndDisarm(STP, AT_D, IDLE, rpm, SPD_CURRENT);
+		CheckCruiseAndDisarm(STP, AT_D, IDLE, rpm, SPD.CURRENT);
 		readADC();
 		ReadCruiseSwitch();
 		ticktock++;
@@ -511,7 +533,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		CRUISE.tick++;
 		if (CRUISE.ARMED && CRUISE.tick == 5) {
 			CRUISE.tick = 0;
-			pid_error = SPD_CURRENT - SPD_TARGET;
+			CalculateSPEED();
+			pid_error = SPD.CURRENT - SPD.TARGET;
 			CRUISE.PID_OUT = (int) arm_pid_f32(&PID, pid_error);
 			//если результат пида отрицательный до включается реверс, а сама переменная становится положительной
 			if (CRUISE.PID_OUT == 0) {
@@ -534,17 +557,25 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		CalculateRPM();
 	}
 	if (htim->Instance == TIM3) {
-		lowspeed = true; //если переполнился счетчик таймера спидометра - значит слишком медленная скорость
-		SPD_Pulse_width = 0;
+		SPD.lowspeed = true; //если переполнился счетчик таймера спидометра - значит слишком медленная скорость
+		SPD.Pulse_width = 0;
 	}
-
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) // =RISING= EDGE DETECTED
 		__HAL_TIM_SET_COUNTER(&htim3, 0x00);
 	else if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2) // =FALLING= EDGE DETECTED
+			{
+		//Скорость считается по времени между первым и вторым фронтами.
+		//Длительность фронтов суммируется и далее усредняется каждые 100ms todo:наверное надо усреднять каждые 500мс, как раз перед вычислением PID
+		//длина фронта измеряется в микросекундах с разрешением 10микросекунд.
+		//достаточно для измерения скорости от 2-3км\ч. Ниже будет возникать ошибка которая исправляется в обработчике переполнения таймера
+		//а так же при вычислении средней скорости.
 		IC_Faling_Val = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+		SPD.Pulse_width += IC_Faling_Val * 10;
+		SPD.index++;
+	}
 }
 
 void showpage(uint8_t page) {
@@ -583,9 +614,9 @@ void showpage(uint8_t page) {
 			u8g2_DrawStr(&u8g2, font_w * 5, font_h * 6, "ATO");
 			itoa(CRUISE.PID_OUT, tmp_string, 10);
 			u8g2_DrawStr(&u8g2, font_w * 3, font_h, tmp_string);
-			itoa((int) (SPD_CURRENT + 0.1), tmp_string, 10);
+			itoa((int) (SPD.CURRENT + 0.1), tmp_string, 10);
 			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 2, tmp_string);
-			itoa((int) SPD_TARGET, tmp_string, 10);
+			itoa((int) SPD.TARGET, tmp_string, 10);
 			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 3, tmp_string);
 			itoa(IC_Faling_Val * 10, tmp_string, 10);
 			u8g2_DrawStr(&u8g2, font_w * 3, font_h * 4, tmp_string);
@@ -704,15 +735,6 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 
 	while (1) {
-		SPD_Pulse_width = IC_Faling_Val * 10;
-		if (SPD_Pulse_width > 300000 || SPD_Pulse_width < 1000) {
-			lowspeed = true;
-			SPD_Pulse_width = 0;
-			SPD_CURRENT = 0;
-		} else {
-			SPD_CURRENT = 600.0 / (SPD_Pulse_width / 1000.0);
-			lowspeed = false;
-		}
 
 		if (CRUISE.ARMED && CRUISE.THR_MOVING) {
 			CRUISE.MOVE_TIME_CURRENT = HAL_GetTick();
