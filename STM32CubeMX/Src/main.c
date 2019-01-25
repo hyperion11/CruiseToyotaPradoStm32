@@ -144,6 +144,7 @@ struct CRUISESTR {
 	int8_t MOVE_TIME;
 	uint8_t DIR;
 	int32_t PID_OUT;
+	uint8_t tick;
 ////
 } CRUISE;
 float SPD_CURRENT, SPD_TARGET;
@@ -220,7 +221,7 @@ void disarm(void) {
 	//отключение индикатора круиза
 	HAL_GPIO_WritePin(GPIOB, CRUISE_LAMP_OUT_PB15_Pin, GPIO_PIN_RESET);
 	//останов привода круиза
-	//setMSpeed(0);
+	move_throttle(STOP);
 	arm_pid_reset_f32(&PID);
 
 }
@@ -507,7 +508,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		ReadCruiseSwitch();
 		ticktock++;
 		second++;
-		if (CRUISE.ARMED) {
+		CRUISE.tick++;
+		if (CRUISE.ARMED && CRUISE.tick == 5) {
+			CRUISE.tick = 0;
 			pid_error = SPD_CURRENT - SPD_TARGET;
 			CRUISE.PID_OUT = (int) arm_pid_f32(&PID, pid_error);
 			//если результат пида отрицательный до включается реверс, а сама переменная становится положительной
@@ -521,10 +524,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 				CRUISE.MOVE_TIME = CRUISE.PID_OUT;
 				CRUISE.DIR = CV;
 			}
-			//Управление мотором каждые 100мс
-			//длительность импульса максимум 99мс
-			if (CRUISE.MOVE_TIME > 99)
-				CRUISE.MOVE_TIME = 99;
+			//Управление мотором каждые 500мс
+			//длительность импульса максимум 20мс
+			if (CRUISE.MOVE_TIME > 20)
+				CRUISE.MOVE_TIME = 20;
 			CRUISE.THR_MOVING = true;
 			CRUISE.MOVE_TIME_START = HAL_GetTick();
 		}
@@ -639,6 +642,7 @@ int main(void) {
 	CRUISE.MOVE_TIME_CURRENT = 0;
 	CRUISE.MOVE_TIME_START = 0;
 	CRUISE.THR_MOVING = false;
+	CRUISE.tick = 0;
 	/* USER CODE END Init */
 
 	/* Configure the system clock */
@@ -710,18 +714,15 @@ int main(void) {
 			lowspeed = false;
 		}
 
-		if (CRUISE.ARMED) {
-			if (CRUISE.THR_MOVING) {
-				CRUISE.MOVE_TIME_CURRENT = HAL_GetTick();
-				if (CRUISE.MOVE_TIME_CURRENT
-						<= CRUISE.MOVE_TIME_START + abs(CRUISE.MOVE_TIME)) {
-					move_throttle(CRUISE.DIR);
-				} else {
-					move_throttle(STOP);
-					CRUISE.THR_MOVING = false;
-				}
+		if (CRUISE.ARMED && CRUISE.THR_MOVING) {
+			CRUISE.MOVE_TIME_CURRENT = HAL_GetTick();
+			if (CRUISE.MOVE_TIME_CURRENT
+					<= CRUISE.MOVE_TIME_START + abs(CRUISE.MOVE_TIME)) {
+				move_throttle(CRUISE.DIR);
+			} else {
+				move_throttle(STOP);
+				CRUISE.THR_MOVING = false;
 			}
-
 		}
 
 		if (ticktock >= 4) {
