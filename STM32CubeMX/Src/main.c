@@ -83,9 +83,6 @@ enum EDITED_VALUE {
 enum DIR {
 	CV, CCV, STOP
 };
-
-uint8_t EDITED_VALUE_NUM = 0;
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -107,25 +104,19 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN PV */
-volatile uint16_t ticktock = 0;
+volatile uint8_t EDITED_VALUE_NUM = 0;
+volatile uint8_t GUI_counter = 0;
 volatile uint16_t ADC_Data[3]; //0-Current Sensor CH7;;;; 1-TPS CH8;;;; 2-Switch;;;;
 volatile uint8_t OldKeyValue = 5; // Состояние покоя
-volatile int s = 0;
-
 volatile uint16_t rpm_ticks = 0, rpm = 0;
-volatile uint16_t second;
+volatile uint8_t second;
 volatile uint8_t NewKeyValue = 5;
 const uint16_t values[5] = { 0, 564, 1215, 2075, 2300 };
 const uint8_t error = 65;       // Величина отклонения от значений - погрешность
-static u8g2_t u8g2;
 uint32_t amountsent = 0;
 bool EEPROM_RECENT_WRITE = false;
 volatile uint32_t IC_Faling_Val; // Direct mode	Faling Edge Detection
-volatile bool pidloop;
-uint8_t detectlongpress[4];
-
-arm_pid_instance_f32 PID;
-
+volatile uint8_t detectlongpress[4];
 volatile float pid_error;
 struct EESTR {
 	float PID_P;
@@ -135,33 +126,29 @@ struct EESTR {
 } EEPROM;
 
 struct CRUISESTR {
-	bool ARMED;
-	bool THR_MOVING;
-	uint32_t MOVE_TIME_START;
-	uint32_t MOVE_TIME_CURRENT;
-	int8_t MOVE_TIME;
-	uint8_t DIR;
-	int32_t PID_OUT;
-	uint8_t tick;
+	volatile bool ARMED;
+	volatile bool THR_MOVING;
+	volatile uint32_t MOVE_TIME_END;
+	volatile uint8_t DIR;
+	volatile int32_t PID_OUT;
+	volatile uint8_t tick;
 } CRUISE;
 
-struct SPDSTR {
+volatile struct SPDSTR {
 	float CURRENT;
 	float TARGET;
 	float Pulse_width_avg;
-	volatile uint32_t Pulse_width;
-	volatile bool lowspeed;
+	uint32_t Pulse_width;
+	bool lowspeed;
 	uint16_t index;
-
 } SPD;
-bool STP = false, AT_OD = false, IDLE = true, AT_D = false;
+volatile bool STP = false, AT_OD = false, IDLE = true, AT_D = false;
 volatile uint8_t screen = 1;
 uint8_t activescreen = 0;
 const uint16_t devAddr = (0x50 << 1); // HAL expects address to be shifted one bit to the left
-//const uint16_t memAddrP = 0;
-//const uint16_t memAddrI = 0 + sizeof(PID_P);
-//const uint16_t memAddrD = 0 + sizeof(PID_P) + sizeof(PID_I);
 
+static u8g2_t u8g2;
+arm_pid_instance_f32 PID;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -199,22 +186,18 @@ void SaveToEEPROM() {
 
 void move_throttle(uint8_t dir) {
 	if (dir == STOP) {
+		//PWM сигнал в ноль
 		TIM2->CCR1 = 0;
-		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INA_Pin,
-				GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INB_Pin,
-				GPIO_PIN_RESET);
+		//На управляющие пины драйвера мотора ноли
+		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INA_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INB_Pin, GPIO_PIN_RESET);
 	} else if (dir == CV) {
-		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INA_Pin,
-				GPIO_PIN_SET);
-		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INB_Pin,
-				GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INA_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INB_Pin, GPIO_PIN_RESET);
 		TIM2->CCR1 = 450;
 	} else if (dir == CCV) {
-		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INA_Pin,
-				GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INB_Pin,
-				GPIO_PIN_SET);
+		HAL_GPIO_WritePin(VNH2_SP30_INA_GPIO_Port, VNH2_SP30_INA_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(VNH2_SP30_INB_GPIO_Port, VNH2_SP30_INB_Pin, GPIO_PIN_SET);
 		TIM2->CCR1 = 450;
 	}
 }
@@ -231,10 +214,9 @@ void disarm(void) {
 
 }
 
-void CheckCruiseAndDisarm(bool STP_Status, bool AT_D_Status,
-bool IDLE_Status, uint16_t RPM_Status, float SPD_Status) {
+void CheckCruiseAndDisarm() {
 	//if (CRUISE.ARMED == true)
-	//if (STP_Status == true || AT_D_Status == false || IDLE_Status == true	|| RPM_Status > 3500 || SPD_Status > 130.0 || SPD_Status < 40.0)
+	//if (STP == true || AT_D == false || IDLE == true	|| rpm > 3500 || SPD.CURRENT > 130.0 || SPD.CURRENT < 40.0)
 	//disarm();
 }
 
@@ -326,7 +308,7 @@ void AdjustValue(uint8_t value, uint8_t action) {
 	}
 }
 
-uint8_t ReadCruiseSwitch() {
+void ReadCruiseSwitch() {
 	NewKeyValue = GetButtonNumberByValue(ADC_Data[Switch_Data]);
 	//OldKeyValue 1
 	//NewKeyValue 5
@@ -374,6 +356,7 @@ uint8_t ReadCruiseSwitch() {
 			if (detectlongpress[OldKeyValue] > LONG_PRESS_DURATION) {
 				//длинное нажание на RES
 				detectlongpress[OldKeyValue] = 0;
+				break;
 			}
 			OldKeyValue = NewKeyValue;
 			if (CRUISE.ARMED && screen == 1)
@@ -388,6 +371,7 @@ uint8_t ReadCruiseSwitch() {
 			if (detectlongpress[OldKeyValue] > LONG_PRESS_DURATION) {
 				//длинное нажание на SET
 				detectlongpress[OldKeyValue] = 0;
+				break;
 			}
 			OldKeyValue = NewKeyValue;
 			//На основном экране уменьшение желаемой скорости
@@ -422,11 +406,9 @@ uint8_t ReadCruiseSwitch() {
 
 	} else
 		OldKeyValue = NewKeyValue;
-	return OldKeyValue;
 }
 
-uint8_t u8x8_gpio_and_delay_mine(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,
-		void *arg_ptr) {
+uint8_t u8x8_gpio_and_delay_mine(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
 	switch (msg) {
 	case U8X8_MSG_GPIO_AND_DELAY_INIT:
 		break;
@@ -500,9 +482,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }
 void CalculateSPEED() {
 	//Скорость усредняется
-	SPD.Pulse_width_avg=SPD.Pulse_width/SPD.index;
-	SPD.Pulse_width=0;
-	SPD.index=0;
+	SPD.Pulse_width_avg = SPD.Pulse_width / SPD.index;
+	SPD.Pulse_width = 0;
+	SPD.index = 0;
 	if (SPD.Pulse_width_avg > 300000 || SPD.Pulse_width_avg < 1000) {
 		SPD.lowspeed = true;
 		SPD.Pulse_width_avg = 0;
@@ -515,46 +497,50 @@ void CalculateSPEED() {
 }
 
 void CalculateRPM() {
+	second++;
 	if (second == 10) {
 		rpm = rpm_ticks * 40;
 		second = 0;
 		rpm_ticks = 0;
 	}
 }
+void PIDLoop() {
+	pid_error = SPD.CURRENT - SPD.TARGET;
+	CRUISE.PID_OUT = (int) arm_pid_f32(&PID, pid_error);
+	//если результат пида отрицательный до включается реверс, а сама переменная становится положительной
+	//Управление мотором каждые 500мс
+	//длительность импульса максимум 20мс
+	if (CRUISE.PID_OUT == 0) {
+		CRUISE.DIR = STOP;
+	} else if (CRUISE.PID_OUT < 0) {
+		if (CRUISE.PID_OUT < -20)
+			CRUISE.PID_OUT = 20;
+		CRUISE.MOVE_TIME_END = HAL_GetTick() + CRUISE.PID_OUT;
+		CRUISE.DIR = CCV;
+	} else {
+		if (CRUISE.PID_OUT > 20)
+			CRUISE.PID_OUT = 20;
+		CRUISE.MOVE_TIME_END = HAL_GetTick();
+		+CRUISE.PID_OUT;
+		CRUISE.DIR = CV;
+	}
+	CRUISE.THR_MOVING = true;
+}
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM1) {
 		//прерывание каждые 100мс
 		readGPIO();
-		CheckCruiseAndDisarm(STP, AT_D, IDLE, rpm, SPD.CURRENT);
+		CheckCruiseAndDisarm();
 		readADC();
 		ReadCruiseSwitch();
-		ticktock++;
-		second++;
-		CRUISE.tick++;
-		if (CRUISE.ARMED && CRUISE.tick == 5) {
+		GUI_counter++; //Счетчик для отображения информации на экране
+		CRUISE.tick++; //Счетчик цикла PID регуляции todo: 500мс пока что
+		if (CRUISE.ARMED && CRUISE.tick == 5){
 			CRUISE.tick = 0;
 			CalculateSPEED();
-			pid_error = SPD.CURRENT - SPD.TARGET;
-			CRUISE.PID_OUT = (int) arm_pid_f32(&PID, pid_error);
-			//если результат пида отрицательный до включается реверс, а сама переменная становится положительной
-			if (CRUISE.PID_OUT == 0) {
-				CRUISE.MOVE_TIME = 0;
-				CRUISE.DIR = STOP;
-			} else if (CRUISE.PID_OUT < 0) {
-				CRUISE.MOVE_TIME = -CRUISE.PID_OUT;
-				CRUISE.DIR = CCV;
-			} else {
-				CRUISE.MOVE_TIME = CRUISE.PID_OUT;
-				CRUISE.DIR = CV;
-			}
-			//Управление мотором каждые 500мс
-			//длительность импульса максимум 20мс
-			if (CRUISE.MOVE_TIME > 20)
-				CRUISE.MOVE_TIME = 20;
-			CRUISE.THR_MOVING = true;
-			CRUISE.MOVE_TIME_START = HAL_GetTick();
+			PIDLoop();
 		}
-		CalculateRPM();
+		CalculateRPM(); //Вычисление оборотов. Раз в секунду думаю будет достаточно
 	}
 	if (htim->Instance == TIM3) {
 		SPD.lowspeed = true; //если переполнился счетчик таймера спидометра - значит слишком медленная скорость
@@ -669,9 +655,6 @@ int main(void) {
 
 	/* USER CODE BEGIN Init */
 	CRUISE.ARMED = false;
-	CRUISE.MOVE_TIME = 0;
-	CRUISE.MOVE_TIME_CURRENT = 0;
-	CRUISE.MOVE_TIME_START = 0;
 	CRUISE.THR_MOVING = false;
 	CRUISE.tick = 0;
 	/* USER CODE END Init */
@@ -697,8 +680,7 @@ int main(void) {
 	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-	u8g2_Setup_ssd1306_i2c_128x64_noname_1(&u8g2, U8G2_R0,
-			u8x8_byte_stm32f103_hw_i2c, u8x8_gpio_and_delay_mine);
+	u8g2_Setup_ssd1306_i2c_128x64_noname_1(&u8g2, U8G2_R0, u8x8_byte_stm32f103_hw_i2c, u8x8_gpio_and_delay_mine);
 	u8g2_InitDisplay(&u8g2); // send init sequence to the display, display is in sleep mode after this,
 	u8g2_SetPowerSave(&u8g2, 0); // wake up display
 
@@ -737,20 +719,16 @@ int main(void) {
 	while (1) {
 
 		if (CRUISE.ARMED && CRUISE.THR_MOVING) {
-			CRUISE.MOVE_TIME_CURRENT = HAL_GetTick();
-			if (CRUISE.MOVE_TIME_CURRENT
-					<= CRUISE.MOVE_TIME_START + abs(CRUISE.MOVE_TIME)) {
+			if (HAL_GetTick() <= CRUISE.MOVE_TIME_END) {
 				move_throttle(CRUISE.DIR);
 			} else {
 				move_throttle(STOP);
 				CRUISE.THR_MOVING = false;
 			}
 		}
-
-		if (ticktock >= 4) {
+		if (GUI_counter >= 4) {
 			showpage(screen);
-			ticktock = 0;
-
+			GUI_counter = 0;
 		}
 
 		/* USER CODE END WHILE */
@@ -771,8 +749,7 @@ void SystemClock_Config(void) {
 
 	/**Initializes the CPU, AHB and APB busses clocks
 	 */
-	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE
-			| RCC_OSCILLATORTYPE_LSE;
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
 	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
 	RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
 	RCC_OscInitStruct.LSEState = RCC_LSE_ON;
@@ -785,8 +762,7 @@ void SystemClock_Config(void) {
 	}
 	/**Initializes the CPU, AHB and APB busses clocks
 	 */
-	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-			| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
 	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -1009,8 +985,7 @@ static void MX_TIM1_Init(void) {
 	}
 	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
 	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-	if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig)
-			!= HAL_OK) {
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK) {
 		Error_Handler();
 	}
 	/* USER CODE BEGIN TIM1_Init 2 */
@@ -1047,16 +1022,14 @@ static void MX_TIM2_Init(void) {
 	}
 	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
 	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-	if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig)
-			!= HAL_OK) {
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK) {
 		Error_Handler();
 	}
 	sConfigOC.OCMode = TIM_OCMODE_PWM1;
 	sConfigOC.Pulse = 0;
 	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
 	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-	if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1)
-			!= HAL_OK) {
+	if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) {
 		Error_Handler();
 	}
 	/* USER CODE BEGIN TIM2_Init 2 */
@@ -1102,8 +1075,7 @@ static void MX_TIM3_Init(void) {
 	}
 	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
 	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-	if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig)
-			!= HAL_OK) {
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK) {
 		Error_Handler();
 	}
 	sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
@@ -1147,9 +1119,8 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOB,
-			TB6612FNG_STB_Pin | PB10_OUT_SOLENOID_Pin | OD_OUT_BUTTON_PB13_Pin
-					| CRUISE_LAMP_OUT_PB15_Pin | VNH2_SP30_INA_Pin
-					| VNH2_SP30_INB_Pin, GPIO_PIN_RESET);
+			TB6612FNG_STB_Pin | PB10_OUT_SOLENOID_Pin | OD_OUT_BUTTON_PB13_Pin | CRUISE_LAMP_OUT_PB15_Pin
+					| VNH2_SP30_INA_Pin | VNH2_SP30_INB_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin : PC13_Pin */
 	GPIO_InitStruct.Pin = PC13_Pin;
@@ -1161,9 +1132,8 @@ static void MX_GPIO_Init(void) {
 	/*Configure GPIO pins : PA1 PA2 PA4 PA5
 	 PA6 PA9 PA10 PA11
 	 PA12 PA15 */
-	GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_5
-			| GPIO_PIN_6 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12
-			| GPIO_PIN_15;
+	GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_9 | GPIO_PIN_10
+			| GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_15;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -1175,8 +1145,7 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pins : TB6612FNG_STB_Pin PB10_OUT_SOLENOID_Pin OD_OUT_BUTTON_PB13_Pin CRUISE_LAMP_OUT_PB15_Pin
 	 VNH2_SP30_INA_Pin VNH2_SP30_INB_Pin */
-	GPIO_InitStruct.Pin = TB6612FNG_STB_Pin | PB10_OUT_SOLENOID_Pin
-			| OD_OUT_BUTTON_PB13_Pin | CRUISE_LAMP_OUT_PB15_Pin
+	GPIO_InitStruct.Pin = TB6612FNG_STB_Pin | PB10_OUT_SOLENOID_Pin | OD_OUT_BUTTON_PB13_Pin | CRUISE_LAMP_OUT_PB15_Pin
 			| VNH2_SP30_INA_Pin | VNH2_SP30_INB_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
