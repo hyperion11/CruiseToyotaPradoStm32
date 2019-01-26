@@ -131,7 +131,7 @@ struct CRUISESTR {
 	volatile bool THR_MOVING;
 	volatile uint32_t MOVE_TIME_END;
 	volatile uint8_t DIR;
-	volatile int32_t PID_OUT;
+	volatile int8_t PID_OUT;
 	volatile uint8_t tick;
 } CRUISE;
 
@@ -507,15 +507,14 @@ void CalculateRPM() {
 }
 void PIDLoop() {
 	pid_error = SPD.CURRENT - SPD.TARGET;
-	CRUISE.PID_OUT = constrain((int ) arm_pid_f32(&PID, pid_error), -20, 20);
+	CRUISE.PID_OUT = constrain((int ) arm_pid_f32(&PID, pid_error), -125, 125); //int8t =-127...127 да и наверное 127 импульса будет более чем достаточно
 	//если результат пида отрицательный до включается реверс, а сама переменная становится положительной
 	//Управление мотором каждые 500мс
 	//длительность импульса максимум 20мс
-
 	if (CRUISE.PID_OUT == 0) {
 		CRUISE.DIR = STOP;
 	} else if (CRUISE.PID_OUT < 0) {
-		CRUISE.MOVE_TIME_END = HAL_GetTick() + CRUISE.PID_OUT;
+		CRUISE.MOVE_TIME_END = HAL_GetTick() + abs(CRUISE.PID_OUT);
 		CRUISE.DIR = CCV;
 	} else {
 		CRUISE.MOVE_TIME_END = HAL_GetTick() + CRUISE.PID_OUT;
@@ -532,10 +531,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		ReadCruiseSwitch();
 		GUI_counter++; //Счетчик для отображения информации на экране
 		CRUISE.tick++; //Счетчик цикла PID регуляции todo: 500мс пока что
-		if (CRUISE.ARMED && CRUISE.tick == 5) {
+		if (CRUISE.tick == 5) {
 			CRUISE.tick = 0;
 			CalculateSPEED();
-			PIDLoop();
+			if (CRUISE.ARMED) {
+				PIDLoop();
+			}
 		}
 		CalculateRPM(); //Вычисление оборотов. Раз в секунду думаю будет достаточно
 	}
