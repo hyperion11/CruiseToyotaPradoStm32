@@ -8,20 +8,20 @@
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
-<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
-<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="no"/>
-<layer number="20" name="Dimension" color="24" fill="1" visible="yes" active="no"/>
-<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="no"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="no"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="no"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="no"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="no"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="no"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="no"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="no"/>
+<layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="no"/>
+<layer number="20" name="Dimension" color="24" fill="1" visible="no" active="no"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="no" active="no"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="no"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="no"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="no" active="no"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="no" active="no"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="no" active="no"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="no" active="no"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="no"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="no"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="no"/>
@@ -30,8 +30,8 @@
 <layer number="34" name="bFinish" color="6" fill="6" visible="no" active="no"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="no"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="no"/>
-<layer number="37" name="tTest" color="7" fill="1" visible="yes" active="no"/>
-<layer number="38" name="bTest" color="7" fill="1" visible="yes" active="no"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="no"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="no"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="no"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="no"/>
@@ -39,19 +39,19 @@
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="no"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="no"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="no"/>
-<layer number="46" name="Milling" color="3" fill="1" visible="yes" active="no"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="no"/>
-<layer number="48" name="Document" color="7" fill="1" visible="yes" active="no"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="no"/>
-<layer number="50" name="dxf" color="7" fill="1" visible="yes" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="no"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="no"/>
-<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="yes" active="no"/>
-<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="yes" active="no"/>
-<layer number="56" name="wert" color="7" fill="1" visible="yes" active="no"/>
-<layer number="57" name="tCAD" color="7" fill="1" visible="yes" active="no"/>
-<layer number="59" name="tCarbon" color="7" fill="1" visible="yes" active="no"/>
-<layer number="60" name="bCarbon" color="7" fill="1" visible="yes" active="no"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="no"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
+<layer number="48" name="Document" color="7" fill="1" visible="no" active="no"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
+<layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="no"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
+<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
+<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
+<layer number="56" name="wert" color="7" fill="1" visible="no" active="no"/>
+<layer number="57" name="tCAD" color="7" fill="1" visible="no" active="no"/>
+<layer number="59" name="tCarbon" color="7" fill="1" visible="no" active="no"/>
+<layer number="60" name="bCarbon" color="7" fill="1" visible="no" active="no"/>
 <layer number="88" name="SimResults" color="9" fill="1" visible="yes" active="yes"/>
 <layer number="89" name="SimProbes" color="9" fill="1" visible="yes" active="yes"/>
 <layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
@@ -144,493 +144,6 @@
 </layers>
 <schematic xreflabel="%F%N/%S.%C%R" xrefpart="/%S.%C%R">
 <libraries>
-<library name="microchip" urn="urn:adsk.eagle:library:294">
-<description>&lt;b&gt;Microchip PIC Microcontrollers and other Devices&lt;/b&gt;&lt;p&gt;
-Based on the following sources :
-&lt;ul&gt;
-&lt;li&gt;Microchip Data Book, 1993
-&lt;li&gt;THE EMERGING WORLD STANDARD, 1995/1996
-&lt;li&gt;Microchip, Technical Library CD-ROM, June 1998
-&lt;li&gt;www.microchip.com
-&lt;/ul&gt;
-&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
-<packages>
-<package name="SO-08" urn="urn:adsk.eagle:footprint:20622/1" library_version="2">
-<description>&lt;B&gt;Small Outline Narrow Plastic Gull Wing&lt;/B&gt;&lt;p&gt;
-150-mil body, package type SN</description>
-<wire x1="-2.9" y1="3.9" x2="2.9" y2="3.9" width="0.1998" layer="39"/>
-<wire x1="2.9" y1="3.9" x2="2.9" y2="-3.9" width="0.1998" layer="39"/>
-<wire x1="2.9" y1="-3.9" x2="-2.9" y2="-3.9" width="0.1998" layer="39"/>
-<wire x1="-2.9" y1="-3.9" x2="-2.9" y2="3.9" width="0.1998" layer="39"/>
-<wire x1="2.4" y1="1.9" x2="2.4" y2="-1.4" width="0.2032" layer="51"/>
-<wire x1="2.4" y1="-1.4" x2="2.4" y2="-1.9" width="0.2032" layer="51"/>
-<wire x1="2.4" y1="-1.9" x2="-2.4" y2="-1.9" width="0.2032" layer="51"/>
-<wire x1="-2.4" y1="-1.9" x2="-2.4" y2="-1.4" width="0.2032" layer="51"/>
-<wire x1="-2.4" y1="-1.4" x2="-2.4" y2="1.9" width="0.2032" layer="51"/>
-<wire x1="-2.4" y1="1.9" x2="2.4" y2="1.9" width="0.2032" layer="51"/>
-<wire x1="2.4" y1="-1.4" x2="-2.4" y2="-1.4" width="0.2032" layer="51"/>
-<smd name="2" x="-0.635" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="7" x="-0.635" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="1" x="-1.905" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="3" x="0.635" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="4" x="1.905" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="8" x="-1.905" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="6" x="0.635" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="5" x="1.905" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<text x="-2.667" y="-1.905" size="1.27" layer="25" rot="R90">&gt;NAME</text>
-<text x="3.937" y="-1.905" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
-<text x="-1.905" y="-0.635" size="0.4064" layer="48">IPC SO8</text>
-<text x="-1.905" y="0.365" size="0.3048" layer="48">JEDEC MS-012 AA</text>
-<rectangle x1="-2.1501" y1="-3.1001" x2="-1.6599" y2="-2" layer="51"/>
-<rectangle x1="-0.8801" y1="-3.1001" x2="-0.3899" y2="-2" layer="51"/>
-<rectangle x1="0.3899" y1="-3.1001" x2="0.8801" y2="-2" layer="51"/>
-<rectangle x1="1.6599" y1="-3.1001" x2="2.1501" y2="-2" layer="51"/>
-<rectangle x1="1.6599" y1="2" x2="2.1501" y2="3.1001" layer="51"/>
-<rectangle x1="0.3899" y1="2" x2="0.8801" y2="3.1001" layer="51"/>
-<rectangle x1="-0.8801" y1="2" x2="-0.3899" y2="3.1001" layer="51"/>
-<rectangle x1="-2.1501" y1="2" x2="-1.6599" y2="3.1001" layer="51"/>
-<rectangle x1="-1" y1="-1" x2="1" y2="1" layer="35"/>
-</package>
-<package name="SO-08M" urn="urn:adsk.eagle:footprint:20614/1" library_version="2">
-<description>&lt;B&gt;Small Outline Medium Plastic Gull Wing&lt;/B&gt;&lt;p&gt;
-207-mil body, package type SM</description>
-<wire x1="2.4" y1="2.43" x2="2.4" y2="-1.93" width="0.2032" layer="21"/>
-<wire x1="2.4" y1="-1.93" x2="2.4" y2="-2.43" width="0.2032" layer="21"/>
-<wire x1="2.4" y1="-2.43" x2="-2.4" y2="-2.43" width="0.2032" layer="51"/>
-<wire x1="-2.4" y1="-2.43" x2="-2.4" y2="-1.93" width="0.2032" layer="21"/>
-<wire x1="-2.4" y1="-1.93" x2="-2.4" y2="2.43" width="0.2032" layer="21"/>
-<wire x1="-2.4" y1="2.43" x2="2.4" y2="2.43" width="0.2032" layer="51"/>
-<wire x1="2.4" y1="-1.93" x2="-2.4" y2="-1.93" width="0.2032" layer="21"/>
-<smd name="2" x="-0.635" y="-3.33" dx="0.6" dy="2.2" layer="1"/>
-<smd name="7" x="-0.635" y="3.33" dx="0.6" dy="2.2" layer="1"/>
-<smd name="1" x="-1.905" y="-3.33" dx="0.6" dy="2.2" layer="1"/>
-<smd name="3" x="0.635" y="-3.33" dx="0.6" dy="2.2" layer="1"/>
-<smd name="4" x="1.905" y="-3.33" dx="0.6" dy="2.2" layer="1"/>
-<smd name="8" x="-1.905" y="3.33" dx="0.6" dy="2.2" layer="1"/>
-<smd name="6" x="0.635" y="3.33" dx="0.6" dy="2.2" layer="1"/>
-<smd name="5" x="1.905" y="3.33" dx="0.6" dy="2.2" layer="1"/>
-<text x="-2.667" y="-2.54" size="1.27" layer="25" rot="R90">&gt;NAME</text>
-<text x="3.937" y="-2.54" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
-<text x="-1.905" y="-1.27" size="0.3048" layer="48">SO8 Medium</text>
-<text x="-1.905" y="-0.635" size="0.3048" layer="48">Microchip</text>
-<rectangle x1="-2.1501" y1="-4.05" x2="-1.6599" y2="-2.5301" layer="21"/>
-<rectangle x1="-0.8801" y1="-4.05" x2="-0.3899" y2="-2.5301" layer="21"/>
-<rectangle x1="0.3899" y1="-4.05" x2="0.8801" y2="-2.5301" layer="21"/>
-<rectangle x1="1.6599" y1="-4.05" x2="2.1501" y2="-2.5301" layer="21"/>
-<rectangle x1="1.6599" y1="2.5301" x2="2.1501" y2="4.05" layer="21"/>
-<rectangle x1="0.3899" y1="2.5301" x2="0.8801" y2="4.05" layer="21"/>
-<rectangle x1="-0.8801" y1="2.5301" x2="-0.3899" y2="4.05" layer="21"/>
-<rectangle x1="-2.1501" y1="2.5301" x2="-1.6599" y2="4.05" layer="21"/>
-</package>
-<package name="DIL8" urn="urn:adsk.eagle:footprint:20613/1" library_version="2">
-<description>&lt;B&gt;Dual In Line&lt;/B&gt;&lt;p&gt;
-package type P</description>
-<wire x1="-5.08" y1="-0.635" x2="-5.08" y2="-2.54" width="0.1524" layer="21"/>
-<wire x1="-5.08" y1="-0.635" x2="-5.08" y2="0.635" width="0.1524" layer="21" curve="180"/>
-<wire x1="5.08" y1="-2.54" x2="-5.08" y2="-2.54" width="0.1524" layer="21"/>
-<wire x1="5.08" y1="-2.54" x2="5.08" y2="2.54" width="0.1524" layer="21"/>
-<wire x1="-5.08" y1="2.54" x2="5.08" y2="2.54" width="0.1524" layer="21"/>
-<wire x1="-5.08" y1="2.54" x2="-5.08" y2="0.635" width="0.1524" layer="21"/>
-<pad name="1" x="-3.81" y="-3.81" drill="0.8128" shape="long" rot="R90" first="yes"/>
-<pad name="2" x="-1.27" y="-3.81" drill="0.8128" shape="long" rot="R90"/>
-<pad name="3" x="1.27" y="-3.81" drill="0.8128" shape="long" rot="R90"/>
-<pad name="4" x="3.81" y="-3.81" drill="0.8128" shape="long" rot="R90"/>
-<pad name="5" x="3.81" y="3.81" drill="0.8128" shape="long" rot="R90"/>
-<pad name="6" x="1.27" y="3.81" drill="0.8128" shape="long" rot="R90"/>
-<pad name="7" x="-1.27" y="3.81" drill="0.8128" shape="long" rot="R90"/>
-<pad name="8" x="-3.81" y="3.81" drill="0.8128" shape="long" rot="R90"/>
-<text x="-5.2578" y="-2.54" size="1.778" layer="25" ratio="10" rot="R90">&gt;NAME</text>
-<text x="7.239" y="-2.54" size="1.778" layer="27" ratio="10" rot="R90">&gt;VALUE</text>
-</package>
-<package name="SO-14" urn="urn:adsk.eagle:footprint:20623/1" library_version="2">
-<description>&lt;B&gt;Small Outline Narrow Plastic Gull Wing&lt;/B&gt;&lt;p&gt;
-150-mil body, package type SL</description>
-<wire x1="-4.895" y1="3.9" x2="4.895" y2="3.9" width="0.1998" layer="39"/>
-<wire x1="4.895" y1="-3.9" x2="-4.895" y2="-3.9" width="0.1998" layer="39"/>
-<wire x1="-4.895" y1="-3.9" x2="-4.895" y2="3.9" width="0.1998" layer="39"/>
-<wire x1="4.305" y1="-1.9" x2="-4.305" y2="-1.9" width="0.2032" layer="51"/>
-<wire x1="-4.305" y1="-1.9" x2="-4.305" y2="-1.4" width="0.2032" layer="51"/>
-<wire x1="-4.305" y1="-1.4" x2="-4.305" y2="1.9" width="0.2032" layer="51"/>
-<wire x1="4.305" y1="-1.4" x2="-4.305" y2="-1.4" width="0.2032" layer="51"/>
-<wire x1="4.305" y1="1.9" x2="4.305" y2="-1.4" width="0.2032" layer="51"/>
-<wire x1="4.305" y1="-1.4" x2="4.305" y2="-1.9" width="0.2032" layer="51"/>
-<wire x1="4.895" y1="3.9" x2="4.895" y2="-3.9" width="0.1998" layer="39"/>
-<wire x1="-4.305" y1="1.9" x2="4.305" y2="1.9" width="0.2032" layer="51"/>
-<smd name="2" x="-2.54" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="13" x="-2.54" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="1" x="-3.81" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="3" x="-1.27" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="4" x="0" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="14" x="-3.81" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="12" x="-1.27" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="11" x="0" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="6" x="2.54" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="9" x="2.54" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="5" x="1.27" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="7" x="3.81" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="10" x="1.27" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<smd name="8" x="3.81" y="2.6" dx="0.6" dy="2.2" layer="1"/>
-<text x="-4.572" y="-1.905" size="1.27" layer="25" rot="R90">&gt;NAME</text>
-<text x="5.842" y="-1.905" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
-<text x="-3.81" y="0.365" size="0.3048" layer="48">JEDEC MS-012 AB</text>
-<text x="-3.81" y="-0.635" size="0.4064" layer="48">IPC SO14</text>
-<rectangle x1="-4.0551" y1="-3.1001" x2="-3.5649" y2="-2" layer="51"/>
-<rectangle x1="-2.7851" y1="-3.1001" x2="-2.2949" y2="-2" layer="51"/>
-<rectangle x1="-1.5151" y1="-3.1001" x2="-1.0249" y2="-2" layer="51"/>
-<rectangle x1="-0.2451" y1="-3.1001" x2="0.2451" y2="-2" layer="51"/>
-<rectangle x1="-0.2451" y1="2" x2="0.2451" y2="3.1001" layer="51"/>
-<rectangle x1="-1.5151" y1="2" x2="-1.0249" y2="3.1001" layer="51"/>
-<rectangle x1="-2.7851" y1="2" x2="-2.2949" y2="3.1001" layer="51"/>
-<rectangle x1="-4.0551" y1="2" x2="-3.5649" y2="3.1001" layer="51"/>
-<rectangle x1="1.0249" y1="-3.1001" x2="1.5151" y2="-2" layer="51"/>
-<rectangle x1="2.2949" y1="-3.1001" x2="2.7851" y2="-2" layer="51"/>
-<rectangle x1="3.5649" y1="-3.1001" x2="4.0551" y2="-2" layer="51"/>
-<rectangle x1="3.5649" y1="2" x2="4.0551" y2="3.1001" layer="51"/>
-<rectangle x1="2.2949" y1="2" x2="2.7851" y2="3.1001" layer="51"/>
-<rectangle x1="1.0249" y1="2" x2="1.5151" y2="3.1001" layer="51"/>
-</package>
-</packages>
-<packages3d>
-<package3d name="SO-08" urn="urn:adsk.eagle:package:20804/2" type="model" library_version="2">
-<description>Small Outline Narrow Plastic Gull Wing
-150-mil body, package type SN</description>
-<packageinstances>
-<packageinstance name="SO-08"/>
-</packageinstances>
-</package3d>
-<package3d name="DIL8" urn="urn:adsk.eagle:package:20796/2" type="model" library_version="2">
-<description>Dual In Line
-package type P</description>
-<packageinstances>
-<packageinstance name="DIL8"/>
-</packageinstances>
-</package3d>
-<package3d name="SO-14" urn="urn:adsk.eagle:package:20808/2" type="model" library_version="2">
-<description>Small Outline Narrow Plastic Gull Wing
-150-mil body, package type SL</description>
-<packageinstances>
-<packageinstance name="SO-14"/>
-</packageinstances>
-</package3d>
-<package3d name="SO-08M" urn="urn:adsk.eagle:package:20798/2" type="model" library_version="4">
-<description>Small Outline Medium Plastic Gull Wing
-207-mil body, package type SM</description>
-<packageinstances>
-<packageinstance name="SO-08M"/>
-</packageinstances>
-</package3d>
-</packages3d>
-<symbols>
-<symbol name="24AA" urn="urn:adsk.eagle:symbol:20621/1" library_version="2">
-<wire x1="-10.16" y1="10.16" x2="12.7" y2="10.16" width="0.254" layer="94"/>
-<wire x1="12.7" y1="10.16" x2="12.7" y2="0" width="0.254" layer="94"/>
-<wire x1="12.7" y1="0" x2="12.7" y2="-7.62" width="0.254" layer="94"/>
-<wire x1="12.7" y1="-7.62" x2="-10.16" y2="-7.62" width="0.254" layer="94"/>
-<wire x1="-10.16" y1="-7.62" x2="-10.16" y2="-5.08" width="0.254" layer="94"/>
-<wire x1="-10.16" y1="-5.08" x2="-10.16" y2="-2.54" width="0.254" layer="94"/>
-<wire x1="-10.16" y1="-2.54" x2="-10.16" y2="0" width="0.254" layer="94"/>
-<wire x1="-10.16" y1="0" x2="-10.16" y2="5.08" width="0.254" layer="94"/>
-<wire x1="-10.16" y1="5.08" x2="-10.16" y2="7.62" width="0.254" layer="94"/>
-<wire x1="-10.16" y1="7.62" x2="-10.16" y2="10.16" width="0.254" layer="94"/>
-<wire x1="-2.54" y1="8.89" x2="4.826" y2="8.89" width="0.1524" layer="94"/>
-<wire x1="4.826" y1="8.89" x2="4.826" y2="0" width="0.1524" layer="94"/>
-<wire x1="4.826" y1="0" x2="4.826" y2="-6.604" width="0.1524" layer="94"/>
-<wire x1="4.826" y1="-6.604" x2="-1.016" y2="-6.604" width="0.1524" layer="94"/>
-<wire x1="-1.016" y1="-6.604" x2="-2.54" y2="-6.604" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="-6.604" x2="-2.54" y2="-5.08" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="-5.08" x2="-2.54" y2="-2.54" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="-2.54" x2="-2.54" y2="0" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="0" x2="-2.54" y2="1.016" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="1.016" x2="-2.54" y2="3.556" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="3.556" x2="-2.54" y2="5.08" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="5.08" x2="-2.54" y2="7.62" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="7.62" x2="-2.54" y2="8.89" width="0.1524" layer="94"/>
-<wire x1="-4.826" y1="0" x2="-2.54" y2="0" width="0.1524" layer="94"/>
-<wire x1="-4.826" y1="-2.54" x2="-2.54" y2="-2.54" width="0.1524" layer="94"/>
-<wire x1="-4.826" y1="-5.08" x2="-2.54" y2="-5.08" width="0.1524" layer="94"/>
-<wire x1="-10.16" y1="0" x2="-8.636" y2="0" width="0.1524" layer="94"/>
-<wire x1="-10.16" y1="-2.54" x2="-8.636" y2="-2.54" width="0.1524" layer="94"/>
-<wire x1="-10.16" y1="-5.08" x2="-8.636" y2="-5.08" width="0.1524" layer="94"/>
-<wire x1="-10.16" y1="7.62" x2="-8.636" y2="7.62" width="0.1524" layer="94"/>
-<wire x1="12.7" y1="0" x2="10.922" y2="0" width="0.1524" layer="94"/>
-<wire x1="5.588" y1="0" x2="4.826" y2="0" width="0.1524" layer="94"/>
-<wire x1="-1.016" y1="8.636" x2="-1.016" y2="3.556" width="0.1524" layer="94"/>
-<wire x1="-1.016" y1="1.016" x2="-1.016" y2="-6.604" width="0.1524" layer="94"/>
-<wire x1="-10.16" y1="5.08" x2="-8.636" y2="5.08" width="0.1524" layer="94"/>
-<wire x1="-4.572" y1="5.08" x2="-2.54" y2="5.08" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="3.556" x2="-1.016" y2="3.556" width="0.1524" layer="94"/>
-<wire x1="-3.81" y1="7.62" x2="-2.54" y2="7.62" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="1.016" x2="-1.016" y2="1.016" width="0.1524" layer="94"/>
-<text x="3.81" y="-4.826" size="1.778" layer="94" rot="R90">Array</text>
-<text x="6.604" y="7.62" size="1.778" layer="95">VCC</text>
-<text x="6.858" y="-6.858" size="1.778" layer="95">GND</text>
-<text x="-10.16" y="11.43" size="1.778" layer="95">&gt;NAME</text>
-<text x="-10.16" y="-10.16" size="1.778" layer="96">&gt;VALUE</text>
-<text x="1.524" y="-4.826" size="1.778" layer="94" rot="R90">EEPROM</text>
-<pin name="VCC" x="7.62" y="12.7" visible="pad" length="short" direction="pwr" rot="R270"/>
-<pin name="GND" x="7.62" y="-10.16" visible="pad" length="short" direction="pwr" rot="R90"/>
-<pin name="SCL" x="-12.7" y="7.62" length="short" direction="in"/>
-<pin name="SDA" x="15.24" y="0" length="short" rot="R180"/>
-<pin name="A0" x="-12.7" y="-5.08" length="short" direction="in"/>
-<pin name="A1" x="-12.7" y="-2.54" length="short" direction="in"/>
-<pin name="A2" x="-12.7" y="0" length="short" direction="in"/>
-<pin name="WP" x="-12.7" y="5.08" length="short" direction="in"/>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="24C*" urn="urn:adsk.eagle:component:20905/5" prefix="IC" library_version="4">
-<description>Serial &lt;B&gt;EEPROM&lt;/B&gt;&lt;p&gt;
-1 K/2 K/4 K</description>
-<gates>
-<gate name="G$1" symbol="24AA" x="0" y="0"/>
-</gates>
-<devices>
-<device name="SN" package="SO-08">
-<connects>
-<connect gate="G$1" pin="A0" pad="1"/>
-<connect gate="G$1" pin="A1" pad="2"/>
-<connect gate="G$1" pin="A2" pad="3"/>
-<connect gate="G$1" pin="GND" pad="4"/>
-<connect gate="G$1" pin="SCL" pad="6"/>
-<connect gate="G$1" pin="SDA" pad="5"/>
-<connect gate="G$1" pin="VCC" pad="8"/>
-<connect gate="G$1" pin="WP" pad="7"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:20804/2"/>
-</package3dinstances>
-<technologies>
-<technology name="01">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="CAT24C01WI-GT3" constant="no"/>
-<attribute name="OC_FARNELL" value="1718117" constant="no"/>
-<attribute name="OC_NEWARK" value="06R0487" constant="no"/>
-</technology>
-<technology name="01A">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="AT24C01BN-SH-B" constant="no"/>
-<attribute name="OC_FARNELL" value="1362638" constant="no"/>
-<attribute name="OC_NEWARK" value="50M3313" constant="no"/>
-</technology>
-<technology name="01C">
-<attribute name="MF" value="MICROCHIP" constant="no"/>
-<attribute name="MPN" value="24C01C/SN" constant="no"/>
-<attribute name="OC_FARNELL" value="unknown" constant="no"/>
-<attribute name="OC_NEWARK" value="96K4061" constant="no"/>
-</technology>
-<technology name="02">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="OC_FARNELL" value="unknown" constant="no"/>
-<attribute name="OC_NEWARK" value="unknown" constant="no"/>
-</technology>
-<technology name="02A">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="OC_FARNELL" value="unknown" constant="no"/>
-<attribute name="OC_NEWARK" value="unknown" constant="no"/>
-</technology>
-<technology name="02C">
-<attribute name="MF" value="MICROCHIP" constant="no"/>
-<attribute name="MPN" value="24C02C/SN" constant="no"/>
-<attribute name="OC_FARNELL" value="1607552" constant="no"/>
-<attribute name="OC_NEWARK" value="96K4065" constant="no"/>
-</technology>
-<technology name="04">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="M24C04-WMN6P" constant="no"/>
-<attribute name="OC_FARNELL" value="9882812" constant="no"/>
-<attribute name="OC_NEWARK" value="83K1376" constant="no"/>
-</technology>
-<technology name="04A">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="OC_FARNELL" value="unknown" constant="no"/>
-<attribute name="OC_NEWARK" value="unknown" constant="no"/>
-</technology>
-<technology name="04C">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="OC_FARNELL" value="unknown" constant="no"/>
-<attribute name="OC_NEWARK" value="unknown" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="SM" package="SO-08M">
-<connects>
-<connect gate="G$1" pin="A0" pad="1"/>
-<connect gate="G$1" pin="A1" pad="2"/>
-<connect gate="G$1" pin="A2" pad="3"/>
-<connect gate="G$1" pin="GND" pad="4"/>
-<connect gate="G$1" pin="SCL" pad="6"/>
-<connect gate="G$1" pin="SDA" pad="5"/>
-<connect gate="G$1" pin="VCC" pad="8"/>
-<connect gate="G$1" pin="WP" pad="7"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:20798/2"/>
-</package3dinstances>
-<technologies>
-<technology name="01">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="M24C01-WMN6P" constant="no"/>
-<attribute name="OC_FARNELL" value="9882790" constant="no"/>
-<attribute name="OC_NEWARK" value="24M5068" constant="no"/>
-</technology>
-<technology name="01A">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="AT24C01BN-SH-B" constant="no"/>
-<attribute name="OC_FARNELL" value="1362638" constant="no"/>
-<attribute name="OC_NEWARK" value="50M3313" constant="no"/>
-</technology>
-<technology name="01C">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="M24C01-WMN6P" constant="no"/>
-<attribute name="OC_FARNELL" value="9882790" constant="no"/>
-<attribute name="OC_NEWARK" value="24M5068" constant="no"/>
-</technology>
-<technology name="02">
-<attribute name="MF" value="MICROCHIP" constant="no"/>
-<attribute name="MPN" value="24C02C-I/SN" constant="no"/>
-<attribute name="OC_FARNELL" value="1084339" constant="no"/>
-<attribute name="OC_NEWARK" value="96K4063" constant="no"/>
-</technology>
-<technology name="02A">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="M24C02-WMN6P" constant="no"/>
-<attribute name="OC_FARNELL" value="9882804" constant="no"/>
-<attribute name="OC_NEWARK" value="10M9771" constant="no"/>
-</technology>
-<technology name="02C">
-<attribute name="MF" value="MICROCHIP" constant="no"/>
-<attribute name="MPN" value="24C02C-I/SN" constant="no"/>
-<attribute name="OC_FARNELL" value="1084339" constant="no"/>
-<attribute name="OC_NEWARK" value="96K4063" constant="no"/>
-</technology>
-<technology name="04">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="CAT24C04WI-G" constant="no"/>
-<attribute name="OC_FARNELL" value="1631136" constant="no"/>
-<attribute name="OC_NEWARK" value="06R0507" constant="no"/>
-</technology>
-<technology name="04A">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="AT24C04BN-SH-B" constant="no"/>
-<attribute name="OC_FARNELL" value="1362643" constant="no"/>
-<attribute name="OC_NEWARK" value="50M3316" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="P" package="DIL8">
-<connects>
-<connect gate="G$1" pin="A0" pad="1"/>
-<connect gate="G$1" pin="A1" pad="2"/>
-<connect gate="G$1" pin="A2" pad="3"/>
-<connect gate="G$1" pin="GND" pad="4"/>
-<connect gate="G$1" pin="SCL" pad="6"/>
-<connect gate="G$1" pin="SDA" pad="5"/>
-<connect gate="G$1" pin="VCC" pad="8"/>
-<connect gate="G$1" pin="WP" pad="7"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:20796/2"/>
-</package3dinstances>
-<technologies>
-<technology name="01">
-<attribute name="MF" value="MICROCHIP" constant="no"/>
-<attribute name="MPN" value="24C01C-I/P" constant="no"/>
-<attribute name="OC_FARNELL" value="1847800" constant="no"/>
-<attribute name="OC_NEWARK" value="92C6948" constant="no"/>
-</technology>
-<technology name="01A">
-<attribute name="MF" value="Arrow Electronics" constant="no"/>
-<attribute name="MPN" value="M24C01-WBN6P" constant="no"/>
-<attribute name="OC_FARNELL" value="9882782" constant="no"/>
-<attribute name="OC_NEWARK" value="93K7306" constant="no"/>
-</technology>
-<technology name="01C">
-<attribute name="MF" value="MICROCHIP" constant="no"/>
-<attribute name="MPN" value="24C01C/P" constant="no"/>
-<attribute name="OC_FARNELL" value="3662901" constant="no"/>
-<attribute name="OC_NEWARK" value="96K4060" constant="no"/>
-</technology>
-<technology name="02">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="OC_FARNELL" value="unknown" constant="no"/>
-<attribute name="OC_NEWARK" value="unknown" constant="no"/>
-</technology>
-<technology name="02A">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="M24C02-WBN6P" constant="no"/>
-<attribute name="OC_FARNELL" value="1094256" constant="no"/>
-<attribute name="OC_NEWARK" value="11M0888" constant="no"/>
-</technology>
-<technology name="02C">
-<attribute name="MF" value="MICROCHIP" constant="no"/>
-<attribute name="MPN" value="24C02C/P" constant="no"/>
-<attribute name="OC_FARNELL" value="1296567" constant="no"/>
-<attribute name="OC_NEWARK" value="96K4064" constant="no"/>
-</technology>
-<technology name="04">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="M24C04-WBN6P" constant="no"/>
-<attribute name="OC_FARNELL" value="1094258" constant="no"/>
-<attribute name="OC_NEWARK" value="02M5802" constant="no"/>
-</technology>
-<technology name="04A">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="AT24C04B-PU" constant="no"/>
-<attribute name="OC_FARNELL" value="1362642" constant="no"/>
-<attribute name="OC_NEWARK" value="50M3315" constant="no"/>
-</technology>
-<technology name="04C">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="CAT24C04LI-G" constant="no"/>
-<attribute name="OC_FARNELL" value="1718374" constant="no"/>
-<attribute name="OC_NEWARK" value="73P4460" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="SL" package="SO-14">
-<connects>
-<connect gate="G$1" pin="A0" pad="2"/>
-<connect gate="G$1" pin="A1" pad="3"/>
-<connect gate="G$1" pin="A2" pad="5"/>
-<connect gate="G$1" pin="GND" pad="6"/>
-<connect gate="G$1" pin="SCL" pad="10"/>
-<connect gate="G$1" pin="SDA" pad="9"/>
-<connect gate="G$1" pin="VCC" pad="13"/>
-<connect gate="G$1" pin="WP" pad="12"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:20808/2"/>
-</package3dinstances>
-<technologies>
-<technology name="01">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="OC_FARNELL" value="unknown" constant="no"/>
-<attribute name="OC_NEWARK" value="unknown" constant="no"/>
-</technology>
-<technology name="02">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="OC_FARNELL" value="unknown" constant="no"/>
-<attribute name="OC_NEWARK" value="unknown" constant="no"/>
-</technology>
-<technology name="04">
-<attribute name="MF" value="" constant="no"/>
-<attribute name="MPN" value="" constant="no"/>
-<attribute name="OC_FARNELL" value="unknown" constant="no"/>
-<attribute name="OC_NEWARK" value="unknown" constant="no"/>
-</technology>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 <library name="resistor" urn="urn:adsk.eagle:library:348">
 <description>&lt;b&gt;Resistors, Capacitors, Inductors&lt;/b&gt;&lt;p&gt;
 Based on the previous libraries:
@@ -27001,6 +26514,485 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </deviceset>
 </devicesets>
 </library>
+<library name="microchip">
+<description>&lt;b&gt;Microchip PIC Microcontrollers and other Devices&lt;/b&gt;&lt;p&gt;
+Based on the following sources :
+&lt;ul&gt;
+&lt;li&gt;Microchip Data Book, 1993
+&lt;li&gt;THE EMERGING WORLD STANDARD, 1995/1996
+&lt;li&gt;Microchip, Technical Library CD-ROM, June 1998
+&lt;li&gt;www.microchip.com
+&lt;/ul&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
+<packages>
+<package name="SO-08" urn="urn:adsk.eagle:footprint:20622/1" locally_modified="yes">
+<description>&lt;B&gt;Small Outline Narrow Plastic Gull Wing&lt;/B&gt;&lt;p&gt;
+150-mil body, package type SN</description>
+<wire x1="-2.9" y1="3.9" x2="2.9" y2="3.9" width="0.1998" layer="39"/>
+<wire x1="2.9" y1="3.9" x2="2.9" y2="-3.9" width="0.1998" layer="39"/>
+<wire x1="2.9" y1="-3.9" x2="-2.9" y2="-3.9" width="0.1998" layer="39"/>
+<wire x1="-2.9" y1="-3.9" x2="-2.9" y2="3.9" width="0.1998" layer="39"/>
+<wire x1="2.4" y1="1.9" x2="2.4" y2="-1.4" width="0.2032" layer="51"/>
+<wire x1="2.4" y1="-1.4" x2="2.4" y2="-1.9" width="0.2032" layer="51"/>
+<wire x1="2.4" y1="-1.9" x2="-2.4" y2="-1.9" width="0.2032" layer="51"/>
+<wire x1="-2.4" y1="-1.9" x2="-2.4" y2="-1.4" width="0.2032" layer="51"/>
+<wire x1="-2.4" y1="-1.4" x2="-2.4" y2="1.9" width="0.2032" layer="51"/>
+<wire x1="-2.4" y1="1.9" x2="2.4" y2="1.9" width="0.2032" layer="51"/>
+<wire x1="2.4" y1="-1.4" x2="-2.4" y2="-1.4" width="0.2032" layer="51"/>
+<smd name="2" x="-0.635" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="7" x="-0.635" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="1" x="-1.905" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="3" x="0.635" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="4" x="1.905" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="8" x="-1.905" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="6" x="0.635" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="5" x="1.905" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<text x="-2.667" y="-1.905" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="3.937" y="-1.905" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
+<text x="-1.905" y="-0.635" size="0.4064" layer="48">IPC SO8</text>
+<text x="-1.905" y="0.365" size="0.3048" layer="48">JEDEC MS-012 AA</text>
+<rectangle x1="-1" y1="-1" x2="1" y2="1" layer="35"/>
+</package>
+<package name="SO-08M" urn="urn:adsk.eagle:footprint:20614/1">
+<description>&lt;B&gt;Small Outline Medium Plastic Gull Wing&lt;/B&gt;&lt;p&gt;
+207-mil body, package type SM</description>
+<wire x1="2.4" y1="2.43" x2="2.4" y2="-1.93" width="0.2032" layer="21"/>
+<wire x1="2.4" y1="-1.93" x2="2.4" y2="-2.43" width="0.2032" layer="21"/>
+<wire x1="2.4" y1="-2.43" x2="-2.4" y2="-2.43" width="0.2032" layer="51"/>
+<wire x1="-2.4" y1="-2.43" x2="-2.4" y2="-1.93" width="0.2032" layer="21"/>
+<wire x1="-2.4" y1="-1.93" x2="-2.4" y2="2.43" width="0.2032" layer="21"/>
+<wire x1="-2.4" y1="2.43" x2="2.4" y2="2.43" width="0.2032" layer="51"/>
+<wire x1="2.4" y1="-1.93" x2="-2.4" y2="-1.93" width="0.2032" layer="21"/>
+<smd name="2" x="-0.635" y="-3.33" dx="0.6" dy="2.2" layer="1"/>
+<smd name="7" x="-0.635" y="3.33" dx="0.6" dy="2.2" layer="1"/>
+<smd name="1" x="-1.905" y="-3.33" dx="0.6" dy="2.2" layer="1"/>
+<smd name="3" x="0.635" y="-3.33" dx="0.6" dy="2.2" layer="1"/>
+<smd name="4" x="1.905" y="-3.33" dx="0.6" dy="2.2" layer="1"/>
+<smd name="8" x="-1.905" y="3.33" dx="0.6" dy="2.2" layer="1"/>
+<smd name="6" x="0.635" y="3.33" dx="0.6" dy="2.2" layer="1"/>
+<smd name="5" x="1.905" y="3.33" dx="0.6" dy="2.2" layer="1"/>
+<text x="-2.667" y="-2.54" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="3.937" y="-2.54" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
+<text x="-1.905" y="-1.27" size="0.3048" layer="48">SO8 Medium</text>
+<text x="-1.905" y="-0.635" size="0.3048" layer="48">Microchip</text>
+<rectangle x1="-2.1501" y1="-4.05" x2="-1.6599" y2="-2.5301" layer="21"/>
+<rectangle x1="-0.8801" y1="-4.05" x2="-0.3899" y2="-2.5301" layer="21"/>
+<rectangle x1="0.3899" y1="-4.05" x2="0.8801" y2="-2.5301" layer="21"/>
+<rectangle x1="1.6599" y1="-4.05" x2="2.1501" y2="-2.5301" layer="21"/>
+<rectangle x1="1.6599" y1="2.5301" x2="2.1501" y2="4.05" layer="21"/>
+<rectangle x1="0.3899" y1="2.5301" x2="0.8801" y2="4.05" layer="21"/>
+<rectangle x1="-0.8801" y1="2.5301" x2="-0.3899" y2="4.05" layer="21"/>
+<rectangle x1="-2.1501" y1="2.5301" x2="-1.6599" y2="4.05" layer="21"/>
+</package>
+<package name="DIL8" urn="urn:adsk.eagle:footprint:20613/1">
+<description>&lt;B&gt;Dual In Line&lt;/B&gt;&lt;p&gt;
+package type P</description>
+<wire x1="-5.08" y1="-0.635" x2="-5.08" y2="-2.54" width="0.1524" layer="21"/>
+<wire x1="-5.08" y1="-0.635" x2="-5.08" y2="0.635" width="0.1524" layer="21" curve="180"/>
+<wire x1="5.08" y1="-2.54" x2="-5.08" y2="-2.54" width="0.1524" layer="21"/>
+<wire x1="5.08" y1="-2.54" x2="5.08" y2="2.54" width="0.1524" layer="21"/>
+<wire x1="-5.08" y1="2.54" x2="5.08" y2="2.54" width="0.1524" layer="21"/>
+<wire x1="-5.08" y1="2.54" x2="-5.08" y2="0.635" width="0.1524" layer="21"/>
+<pad name="1" x="-3.81" y="-3.81" drill="0.8128" shape="long" rot="R90" first="yes"/>
+<pad name="2" x="-1.27" y="-3.81" drill="0.8128" shape="long" rot="R90"/>
+<pad name="3" x="1.27" y="-3.81" drill="0.8128" shape="long" rot="R90"/>
+<pad name="4" x="3.81" y="-3.81" drill="0.8128" shape="long" rot="R90"/>
+<pad name="5" x="3.81" y="3.81" drill="0.8128" shape="long" rot="R90"/>
+<pad name="6" x="1.27" y="3.81" drill="0.8128" shape="long" rot="R90"/>
+<pad name="7" x="-1.27" y="3.81" drill="0.8128" shape="long" rot="R90"/>
+<pad name="8" x="-3.81" y="3.81" drill="0.8128" shape="long" rot="R90"/>
+<text x="-5.2578" y="-2.54" size="1.778" layer="25" ratio="10" rot="R90">&gt;NAME</text>
+<text x="7.239" y="-2.54" size="1.778" layer="27" ratio="10" rot="R90">&gt;VALUE</text>
+</package>
+<package name="SO-14" urn="urn:adsk.eagle:footprint:20623/1">
+<description>&lt;B&gt;Small Outline Narrow Plastic Gull Wing&lt;/B&gt;&lt;p&gt;
+150-mil body, package type SL</description>
+<wire x1="-4.895" y1="3.9" x2="4.895" y2="3.9" width="0.1998" layer="39"/>
+<wire x1="4.895" y1="-3.9" x2="-4.895" y2="-3.9" width="0.1998" layer="39"/>
+<wire x1="-4.895" y1="-3.9" x2="-4.895" y2="3.9" width="0.1998" layer="39"/>
+<wire x1="4.305" y1="-1.9" x2="-4.305" y2="-1.9" width="0.2032" layer="51"/>
+<wire x1="-4.305" y1="-1.9" x2="-4.305" y2="-1.4" width="0.2032" layer="51"/>
+<wire x1="-4.305" y1="-1.4" x2="-4.305" y2="1.9" width="0.2032" layer="51"/>
+<wire x1="4.305" y1="-1.4" x2="-4.305" y2="-1.4" width="0.2032" layer="51"/>
+<wire x1="4.305" y1="1.9" x2="4.305" y2="-1.4" width="0.2032" layer="51"/>
+<wire x1="4.305" y1="-1.4" x2="4.305" y2="-1.9" width="0.2032" layer="51"/>
+<wire x1="4.895" y1="3.9" x2="4.895" y2="-3.9" width="0.1998" layer="39"/>
+<wire x1="-4.305" y1="1.9" x2="4.305" y2="1.9" width="0.2032" layer="51"/>
+<smd name="2" x="-2.54" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="13" x="-2.54" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="1" x="-3.81" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="3" x="-1.27" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="4" x="0" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="14" x="-3.81" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="12" x="-1.27" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="11" x="0" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="6" x="2.54" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="9" x="2.54" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="5" x="1.27" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="7" x="3.81" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="10" x="1.27" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="8" x="3.81" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<text x="-4.572" y="-1.905" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="5.842" y="-1.905" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
+<text x="-3.81" y="0.365" size="0.3048" layer="48">JEDEC MS-012 AB</text>
+<text x="-3.81" y="-0.635" size="0.4064" layer="48">IPC SO14</text>
+<rectangle x1="-4.0551" y1="-3.1001" x2="-3.5649" y2="-2" layer="51"/>
+<rectangle x1="-2.7851" y1="-3.1001" x2="-2.2949" y2="-2" layer="51"/>
+<rectangle x1="-1.5151" y1="-3.1001" x2="-1.0249" y2="-2" layer="51"/>
+<rectangle x1="-0.2451" y1="-3.1001" x2="0.2451" y2="-2" layer="51"/>
+<rectangle x1="-0.2451" y1="2" x2="0.2451" y2="3.1001" layer="51"/>
+<rectangle x1="-1.5151" y1="2" x2="-1.0249" y2="3.1001" layer="51"/>
+<rectangle x1="-2.7851" y1="2" x2="-2.2949" y2="3.1001" layer="51"/>
+<rectangle x1="-4.0551" y1="2" x2="-3.5649" y2="3.1001" layer="51"/>
+<rectangle x1="1.0249" y1="-3.1001" x2="1.5151" y2="-2" layer="51"/>
+<rectangle x1="2.2949" y1="-3.1001" x2="2.7851" y2="-2" layer="51"/>
+<rectangle x1="3.5649" y1="-3.1001" x2="4.0551" y2="-2" layer="51"/>
+<rectangle x1="3.5649" y1="2" x2="4.0551" y2="3.1001" layer="51"/>
+<rectangle x1="2.2949" y1="2" x2="2.7851" y2="3.1001" layer="51"/>
+<rectangle x1="1.0249" y1="2" x2="1.5151" y2="3.1001" layer="51"/>
+</package>
+</packages>
+<packages3d>
+<package3d name="SO-08" urn="urn:adsk.eagle:package:20804/2" locally_modified="yes" type="model">
+<description>Small Outline Narrow Plastic Gull Wing
+150-mil body, package type SN</description>
+<packageinstances>
+<packageinstance name="SO-08"/>
+</packageinstances>
+</package3d>
+<package3d name="SO-08M" urn="urn:adsk.eagle:package:20798/2" type="model">
+<description>Small Outline Medium Plastic Gull Wing
+207-mil body, package type SM</description>
+<packageinstances>
+<packageinstance name="SO-08M"/>
+</packageinstances>
+</package3d>
+<package3d name="DIL8" urn="urn:adsk.eagle:package:20796/2" type="model">
+<description>Dual In Line
+package type P</description>
+<packageinstances>
+<packageinstance name="DIL8"/>
+</packageinstances>
+</package3d>
+<package3d name="SO-14" urn="urn:adsk.eagle:package:20808/2" type="model">
+<description>Small Outline Narrow Plastic Gull Wing
+150-mil body, package type SL</description>
+<packageinstances>
+<packageinstance name="SO-14"/>
+</packageinstances>
+</package3d>
+</packages3d>
+<symbols>
+<symbol name="24AA">
+<wire x1="-10.16" y1="10.16" x2="12.7" y2="10.16" width="0.254" layer="94"/>
+<wire x1="12.7" y1="10.16" x2="12.7" y2="0" width="0.254" layer="94"/>
+<wire x1="12.7" y1="0" x2="12.7" y2="-7.62" width="0.254" layer="94"/>
+<wire x1="12.7" y1="-7.62" x2="-10.16" y2="-7.62" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-7.62" x2="-10.16" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-5.08" x2="-10.16" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-2.54" x2="-10.16" y2="0" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="0" x2="-10.16" y2="5.08" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="5.08" x2="-10.16" y2="7.62" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="7.62" x2="-10.16" y2="10.16" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="8.89" x2="4.826" y2="8.89" width="0.1524" layer="94"/>
+<wire x1="4.826" y1="8.89" x2="4.826" y2="0" width="0.1524" layer="94"/>
+<wire x1="4.826" y1="0" x2="4.826" y2="-6.604" width="0.1524" layer="94"/>
+<wire x1="4.826" y1="-6.604" x2="-1.016" y2="-6.604" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="-6.604" x2="-2.54" y2="-6.604" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="-6.604" x2="-2.54" y2="-5.08" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="-5.08" x2="-2.54" y2="-2.54" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="-2.54" x2="-2.54" y2="0" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="0" x2="-2.54" y2="1.016" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="1.016" x2="-2.54" y2="3.556" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="3.556" x2="-2.54" y2="5.08" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="5.08" x2="-2.54" y2="7.62" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="7.62" x2="-2.54" y2="8.89" width="0.1524" layer="94"/>
+<wire x1="-4.826" y1="0" x2="-2.54" y2="0" width="0.1524" layer="94"/>
+<wire x1="-4.826" y1="-2.54" x2="-2.54" y2="-2.54" width="0.1524" layer="94"/>
+<wire x1="-4.826" y1="-5.08" x2="-2.54" y2="-5.08" width="0.1524" layer="94"/>
+<wire x1="-10.16" y1="0" x2="-8.636" y2="0" width="0.1524" layer="94"/>
+<wire x1="-10.16" y1="-2.54" x2="-8.636" y2="-2.54" width="0.1524" layer="94"/>
+<wire x1="-10.16" y1="-5.08" x2="-8.636" y2="-5.08" width="0.1524" layer="94"/>
+<wire x1="-10.16" y1="7.62" x2="-8.636" y2="7.62" width="0.1524" layer="94"/>
+<wire x1="12.7" y1="0" x2="10.922" y2="0" width="0.1524" layer="94"/>
+<wire x1="5.588" y1="0" x2="4.826" y2="0" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="8.636" x2="-1.016" y2="3.556" width="0.1524" layer="94"/>
+<wire x1="-1.016" y1="1.016" x2="-1.016" y2="-6.604" width="0.1524" layer="94"/>
+<wire x1="-10.16" y1="5.08" x2="-8.636" y2="5.08" width="0.1524" layer="94"/>
+<wire x1="-4.572" y1="5.08" x2="-2.54" y2="5.08" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="3.556" x2="-1.016" y2="3.556" width="0.1524" layer="94"/>
+<wire x1="-3.81" y1="7.62" x2="-2.54" y2="7.62" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="1.016" x2="-1.016" y2="1.016" width="0.1524" layer="94"/>
+<text x="3.81" y="-4.826" size="1.778" layer="94" rot="R90">Array</text>
+<text x="6.604" y="7.62" size="1.778" layer="95">VCC</text>
+<text x="6.858" y="-6.858" size="1.778" layer="95">GND</text>
+<text x="-10.16" y="11.43" size="1.778" layer="95">&gt;NAME</text>
+<text x="-10.16" y="-10.16" size="1.778" layer="96">&gt;VALUE</text>
+<text x="1.524" y="-4.826" size="1.778" layer="94" rot="R90">EEPROM</text>
+<pin name="VCC" x="7.62" y="12.7" visible="pad" length="short" direction="pwr" rot="R270"/>
+<pin name="GND" x="7.62" y="-10.16" visible="pad" length="short" direction="pwr" rot="R90"/>
+<pin name="SCL" x="-12.7" y="7.62" length="short" direction="in"/>
+<pin name="SDA" x="15.24" y="0" length="short" rot="R180"/>
+<pin name="A0" x="-12.7" y="-5.08" length="short" direction="in"/>
+<pin name="A1" x="-12.7" y="-2.54" length="short" direction="in"/>
+<pin name="A2" x="-12.7" y="0" length="short" direction="in"/>
+<pin name="WP" x="-12.7" y="5.08" length="short" direction="in"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="24C*" prefix="IC">
+<description>Serial &lt;B&gt;EEPROM&lt;/B&gt;&lt;p&gt;
+1 K/2 K/4 K</description>
+<gates>
+<gate name="G$1" symbol="24AA" x="0" y="0"/>
+</gates>
+<devices>
+<device name="SN" package="SO-08">
+<connects>
+<connect gate="G$1" pin="A0" pad="1"/>
+<connect gate="G$1" pin="A1" pad="2"/>
+<connect gate="G$1" pin="A2" pad="3"/>
+<connect gate="G$1" pin="GND" pad="4"/>
+<connect gate="G$1" pin="SCL" pad="6"/>
+<connect gate="G$1" pin="SDA" pad="5"/>
+<connect gate="G$1" pin="VCC" pad="8"/>
+<connect gate="G$1" pin="WP" pad="7"/>
+</connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:20804/2"/>
+</package3dinstances>
+<technologies>
+<technology name="01">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="CAT24C01WI-GT3" constant="no"/>
+<attribute name="OC_FARNELL" value="1718117" constant="no"/>
+<attribute name="OC_NEWARK" value="06R0487" constant="no"/>
+</technology>
+<technology name="01A">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="AT24C01BN-SH-B" constant="no"/>
+<attribute name="OC_FARNELL" value="1362638" constant="no"/>
+<attribute name="OC_NEWARK" value="50M3313" constant="no"/>
+</technology>
+<technology name="01C">
+<attribute name="MF" value="MICROCHIP" constant="no"/>
+<attribute name="MPN" value="24C01C/SN" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="96K4061" constant="no"/>
+</technology>
+<technology name="02">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+<technology name="02A">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+<technology name="02C">
+<attribute name="MF" value="MICROCHIP" constant="no"/>
+<attribute name="MPN" value="24C02C/SN" constant="no"/>
+<attribute name="OC_FARNELL" value="1607552" constant="no"/>
+<attribute name="OC_NEWARK" value="96K4065" constant="no"/>
+</technology>
+<technology name="04">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="M24C04-WMN6P" constant="no"/>
+<attribute name="OC_FARNELL" value="9882812" constant="no"/>
+<attribute name="OC_NEWARK" value="83K1376" constant="no"/>
+</technology>
+<technology name="04A">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+<technology name="04C">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+</technologies>
+</device>
+<device name="SM" package="SO-08M">
+<connects>
+<connect gate="G$1" pin="A0" pad="1"/>
+<connect gate="G$1" pin="A1" pad="2"/>
+<connect gate="G$1" pin="A2" pad="3"/>
+<connect gate="G$1" pin="GND" pad="4"/>
+<connect gate="G$1" pin="SCL" pad="6"/>
+<connect gate="G$1" pin="SDA" pad="5"/>
+<connect gate="G$1" pin="VCC" pad="8"/>
+<connect gate="G$1" pin="WP" pad="7"/>
+</connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:20798/2"/>
+</package3dinstances>
+<technologies>
+<technology name="01">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="M24C01-WMN6P" constant="no"/>
+<attribute name="OC_FARNELL" value="9882790" constant="no"/>
+<attribute name="OC_NEWARK" value="24M5068" constant="no"/>
+</technology>
+<technology name="01A">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="AT24C01BN-SH-B" constant="no"/>
+<attribute name="OC_FARNELL" value="1362638" constant="no"/>
+<attribute name="OC_NEWARK" value="50M3313" constant="no"/>
+</technology>
+<technology name="01C">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="M24C01-WMN6P" constant="no"/>
+<attribute name="OC_FARNELL" value="9882790" constant="no"/>
+<attribute name="OC_NEWARK" value="24M5068" constant="no"/>
+</technology>
+<technology name="02">
+<attribute name="MF" value="MICROCHIP" constant="no"/>
+<attribute name="MPN" value="24C02C-I/SN" constant="no"/>
+<attribute name="OC_FARNELL" value="1084339" constant="no"/>
+<attribute name="OC_NEWARK" value="96K4063" constant="no"/>
+</technology>
+<technology name="02A">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="M24C02-WMN6P" constant="no"/>
+<attribute name="OC_FARNELL" value="9882804" constant="no"/>
+<attribute name="OC_NEWARK" value="10M9771" constant="no"/>
+</technology>
+<technology name="02C">
+<attribute name="MF" value="MICROCHIP" constant="no"/>
+<attribute name="MPN" value="24C02C-I/SN" constant="no"/>
+<attribute name="OC_FARNELL" value="1084339" constant="no"/>
+<attribute name="OC_NEWARK" value="96K4063" constant="no"/>
+</technology>
+<technology name="04">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="CAT24C04WI-G" constant="no"/>
+<attribute name="OC_FARNELL" value="1631136" constant="no"/>
+<attribute name="OC_NEWARK" value="06R0507" constant="no"/>
+</technology>
+<technology name="04A">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="AT24C04BN-SH-B" constant="no"/>
+<attribute name="OC_FARNELL" value="1362643" constant="no"/>
+<attribute name="OC_NEWARK" value="50M3316" constant="no"/>
+</technology>
+</technologies>
+</device>
+<device name="P" package="DIL8">
+<connects>
+<connect gate="G$1" pin="A0" pad="1"/>
+<connect gate="G$1" pin="A1" pad="2"/>
+<connect gate="G$1" pin="A2" pad="3"/>
+<connect gate="G$1" pin="GND" pad="4"/>
+<connect gate="G$1" pin="SCL" pad="6"/>
+<connect gate="G$1" pin="SDA" pad="5"/>
+<connect gate="G$1" pin="VCC" pad="8"/>
+<connect gate="G$1" pin="WP" pad="7"/>
+</connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:20796/2"/>
+</package3dinstances>
+<technologies>
+<technology name="01">
+<attribute name="MF" value="MICROCHIP" constant="no"/>
+<attribute name="MPN" value="24C01C-I/P" constant="no"/>
+<attribute name="OC_FARNELL" value="1847800" constant="no"/>
+<attribute name="OC_NEWARK" value="92C6948" constant="no"/>
+</technology>
+<technology name="01A">
+<attribute name="MF" value="Arrow Electronics" constant="no"/>
+<attribute name="MPN" value="M24C01-WBN6P" constant="no"/>
+<attribute name="OC_FARNELL" value="9882782" constant="no"/>
+<attribute name="OC_NEWARK" value="93K7306" constant="no"/>
+</technology>
+<technology name="01C">
+<attribute name="MF" value="MICROCHIP" constant="no"/>
+<attribute name="MPN" value="24C01C/P" constant="no"/>
+<attribute name="OC_FARNELL" value="3662901" constant="no"/>
+<attribute name="OC_NEWARK" value="96K4060" constant="no"/>
+</technology>
+<technology name="02">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+<technology name="02A">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="M24C02-WBN6P" constant="no"/>
+<attribute name="OC_FARNELL" value="1094256" constant="no"/>
+<attribute name="OC_NEWARK" value="11M0888" constant="no"/>
+</technology>
+<technology name="02C">
+<attribute name="MF" value="MICROCHIP" constant="no"/>
+<attribute name="MPN" value="24C02C/P" constant="no"/>
+<attribute name="OC_FARNELL" value="1296567" constant="no"/>
+<attribute name="OC_NEWARK" value="96K4064" constant="no"/>
+</technology>
+<technology name="04">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="M24C04-WBN6P" constant="no"/>
+<attribute name="OC_FARNELL" value="1094258" constant="no"/>
+<attribute name="OC_NEWARK" value="02M5802" constant="no"/>
+</technology>
+<technology name="04A">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="AT24C04B-PU" constant="no"/>
+<attribute name="OC_FARNELL" value="1362642" constant="no"/>
+<attribute name="OC_NEWARK" value="50M3315" constant="no"/>
+</technology>
+<technology name="04C">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="CAT24C04LI-G" constant="no"/>
+<attribute name="OC_FARNELL" value="1718374" constant="no"/>
+<attribute name="OC_NEWARK" value="73P4460" constant="no"/>
+</technology>
+</technologies>
+</device>
+<device name="SL" package="SO-14">
+<connects>
+<connect gate="G$1" pin="A0" pad="2"/>
+<connect gate="G$1" pin="A1" pad="3"/>
+<connect gate="G$1" pin="A2" pad="5"/>
+<connect gate="G$1" pin="GND" pad="6"/>
+<connect gate="G$1" pin="SCL" pad="10"/>
+<connect gate="G$1" pin="SDA" pad="9"/>
+<connect gate="G$1" pin="VCC" pad="13"/>
+<connect gate="G$1" pin="WP" pad="12"/>
+</connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:20808/2"/>
+</package3dinstances>
+<technologies>
+<technology name="01">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+<technology name="02">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+<technology name="04">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -27011,7 +27003,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </class>
 </classes>
 <parts>
-<part name="IC1" library="microchip" library_urn="urn:adsk.eagle:library:294" deviceset="24C*" device="SN" package3d_urn="urn:adsk.eagle:package:20804/2" technology="04A" value="24C04ASN"/>
+<part name="IC1" library="microchip" deviceset="24C*" device="SN" package3d_urn="urn:adsk.eagle:package:20804/2" technology="04A" value="24C04ASN"/>
 <part name="R1" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="10K"/>
 <part name="R2" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="10K"/>
 <part name="R5" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="4.7K"/>
