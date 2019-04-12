@@ -68,9 +68,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define EEPROM_BLOCK_SIZE 32
-#define Current_Data 0
-#define TPS_Data 1
-#define Switch_Data 2
+#define TPS_Data 0
+#define Switch_Data 1
 #define CCV 0
 #define CV 1
 #define font_w 9
@@ -94,8 +93,6 @@ uint8_t EDITED_VALUE_NUM = 0;
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
-CRC_HandleTypeDef hcrc;
-
 I2C_HandleTypeDef hi2c1;
 
 TIM_HandleTypeDef htim1;
@@ -104,14 +101,14 @@ TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN PV */
 volatile uint16_t ticktock = 0;
-volatile uint16_t ADC_Data[3]; //0-Current Sensor CH7;;;; 1-TPS CH8;;;; 2-Switch;;;;
+volatile uint16_t ADC_Data[2]; //0-TPS CH8;;;; 1-Switch CH9 ;;;;
 volatile uint8_t OldKeyValue = 5; // Состояние покоя
 volatile int s = 0;
 volatile bool dir_current, dir_previous;
 volatile uint16_t rpm_ticks = 0, rpm = 0;
 volatile uint16_t second;
 volatile uint8_t NewKeyValue = 5;
-const uint16_t values[5] = { 0, 564, 1215, 2075, 2300 };
+const uint16_t values[5] = { 0, 374, 834, 1373, 2125 };
 const uint8_t error = 65;       // Величина отклонения от значений - погрешность
 static u8g2_t u8g2;
 uint32_t amountsent = 0;
@@ -152,7 +149,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM1_Init(void);
-static void MX_CRC_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_TIM3_Init(void);
@@ -258,12 +254,10 @@ uint8_t GetButtonNumberByValue(uint16_t value) { // Новая функция п
 void readADC() {
 	HAL_ADCEx_InjectedStart(&hadc1);
 	HAL_ADC_PollForConversion(&hadc1, 100);
-	ADC_Data[Current_Data] = HAL_ADCEx_InjectedGetValue(&hadc1,
-	ADC_INJECTED_RANK_1);
 	ADC_Data[TPS_Data] = HAL_ADCEx_InjectedGetValue(&hadc1,
-	ADC_INJECTED_RANK_2);
+	ADC_INJECTED_RANK_1);
 	ADC_Data[Switch_Data] = HAL_ADCEx_InjectedGetValue(&hadc1,
-	ADC_INJECTED_RANK_3);
+	ADC_INJECTED_RANK_2);
 	HAL_ADCEx_InjectedStop(&hadc1);
 }
 
@@ -335,7 +329,7 @@ uint8_t ReadCruiseSwitch() {
 	//Обработка нажатой клавиши в момент ее отпускания. Одновременно с проверкой на долгое нажатие.
 	if (OldKeyValue != NewKeyValue && NewKeyValue == 5) {
 		switch (OldKeyValue) {
-		case 0: {
+		case 1: {
 			//кнопка ON-OFF
 			//При нажатии на главном экране включается-отключается круиз
 			//При нажатии на экране настроек переключается настраиваемый параметр.
@@ -367,7 +361,7 @@ uint8_t ReadCruiseSwitch() {
 			}
 		}
 			break;
-		case 1:       //RES
+		case 2:       //RES
 		{
 			if (detectlongpress[OldKeyValue] > LONG_PRESS_DURATION) {
 				//длинное нажание на RES
@@ -381,7 +375,7 @@ uint8_t ReadCruiseSwitch() {
 			}
 		}
 			break;
-		case 2:       //SET
+		case 3:       //SET
 		{
 			if (detectlongpress[OldKeyValue] > LONG_PRESS_DURATION) {
 				//длинное нажание на SET
@@ -397,7 +391,7 @@ uint8_t ReadCruiseSwitch() {
 			}
 		}
 			break;
-		case 3:       //CANCEL
+		case 4:       //CANCEL
 		{
 			if (detectlongpress[OldKeyValue] > LONG_PRESS_DURATION) {
 				//длинное нажание на cancel
@@ -641,7 +635,6 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC1_Init();
   MX_TIM1_Init();
-  MX_CRC_Init();
   MX_TIM2_Init();
   MX_I2C1_Init();
   MX_TIM3_Init();
@@ -733,12 +726,11 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -753,7 +745,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -800,9 +792,9 @@ static void MX_ADC1_Init(void)
   }
   /** Configure Injected Channel 
   */
-  sConfigInjected.InjectedChannel = ADC_CHANNEL_7;
+  sConfigInjected.InjectedChannel = ADC_CHANNEL_8;
   sConfigInjected.InjectedRank = ADC_INJECTED_RANK_1;
-  sConfigInjected.InjectedNbrOfConversion = 3;
+  sConfigInjected.InjectedNbrOfConversion = 2;
   sConfigInjected.InjectedSamplingTime = ADC_SAMPLETIME_1CYCLE_5;
   sConfigInjected.ExternalTrigInjecConv = ADC_INJECTED_SOFTWARE_START;
   sConfigInjected.AutoInjectedConv = DISABLE;
@@ -814,16 +806,8 @@ static void MX_ADC1_Init(void)
   }
   /** Configure Injected Channel 
   */
-  sConfigInjected.InjectedChannel = ADC_CHANNEL_8;
-  sConfigInjected.InjectedRank = ADC_INJECTED_RANK_2;
-  if (HAL_ADCEx_InjectedConfigChannel(&hadc1, &sConfigInjected) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure Injected Channel 
-  */
   sConfigInjected.InjectedChannel = ADC_CHANNEL_9;
-  sConfigInjected.InjectedRank = ADC_INJECTED_RANK_3;
+  sConfigInjected.InjectedRank = ADC_INJECTED_RANK_2;
   if (HAL_ADCEx_InjectedConfigChannel(&hadc1, &sConfigInjected) != HAL_OK)
   {
     Error_Handler();
@@ -831,32 +815,6 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
-
-}
-
-/**
-  * @brief CRC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_CRC_Init(void)
-{
-
-  /* USER CODE BEGIN CRC_Init 0 */
-
-  /* USER CODE END CRC_Init 0 */
-
-  /* USER CODE BEGIN CRC_Init 1 */
-
-  /* USER CODE END CRC_Init 1 */
-  hcrc.Instance = CRC;
-  if (HAL_CRC_Init(&hcrc) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN CRC_Init 2 */
-
-  /* USER CODE END CRC_Init 2 */
 
 }
 
@@ -1073,7 +1031,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, TB6612FNG_STB_Pin|PB10_OUT_SOLENOID_Pin|OD_OUT_BUTTON_PB13_Pin|CRUISE_LAMP_OUT_PB15_Pin 
-                          |VNH2_SP30_INA_Pin|VNH2_SP30_INB_Pin, GPIO_PIN_RESET);
+                          |GPIO_PIN_5|VNH2_SP30_INA_Pin|VNH2_SP30_INB_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PC13_Pin */
   GPIO_InitStruct.Pin = PC13_Pin;
@@ -1087,12 +1045,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : PD0 PD1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
   /*Configure GPIO pins : PA1 PA2 PA4 PA5 
-                           PA6 PA9 PA10 PA11 
-                           PA12 PA15 */
+                           PA6 PA7 PA9 PA10 
+                           PA11 PA12 PA15 */
   GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_4|GPIO_PIN_5 
-                          |GPIO_PIN_6|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11 
-                          |GPIO_PIN_12|GPIO_PIN_15;
+                          |GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_9|GPIO_PIN_10 
+                          |GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -1103,9 +1066,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(STOP_IN_PA3_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : TB6612FNG_STB_Pin PB10_OUT_SOLENOID_Pin OD_OUT_BUTTON_PB13_Pin CRUISE_LAMP_OUT_PB15_Pin 
-                           VNH2_SP30_INA_Pin VNH2_SP30_INB_Pin */
+                           PB5 VNH2_SP30_INA_Pin VNH2_SP30_INB_Pin */
   GPIO_InitStruct.Pin = TB6612FNG_STB_Pin|PB10_OUT_SOLENOID_Pin|OD_OUT_BUTTON_PB13_Pin|CRUISE_LAMP_OUT_PB15_Pin 
-                          |VNH2_SP30_INA_Pin|VNH2_SP30_INB_Pin;
+                          |GPIO_PIN_5|VNH2_SP30_INA_Pin|VNH2_SP30_INB_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -1135,10 +1098,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(D_IN_PA8_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB3 PB5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_5;
+  /*Configure GPIO pin : PB3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure peripheral I/O remapping */
+  __HAL_AFIO_REMAP_PD01_ENABLE();
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);

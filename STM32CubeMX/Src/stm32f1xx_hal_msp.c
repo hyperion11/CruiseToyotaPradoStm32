@@ -104,6 +104,11 @@ void HAL_MspInit(void)
 
   /* System interrupt init*/
 
+  /* Peripheral interrupt init */
+  /* RCC_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(RCC_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(RCC_IRQn);
+
   /** NOJTAG: JTAG-DP Disabled and SW-DP Enabled 
   */
   __HAL_AFIO_REMAP_SWJ_NOJTAG();
@@ -130,17 +135,11 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     /* Peripheral clock enable */
     __HAL_RCC_ADC1_CLK_ENABLE();
   
-    __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     /**ADC1 GPIO Configuration    
-    PA7     ------> ADC1_IN7
     PB0     ------> ADC1_IN8
     PB1     ------> ADC1_IN9 
     */
-    GPIO_InitStruct.Pin = VNH2_SP30_CS_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    HAL_GPIO_Init(VNH2_SP30_CS_GPIO_Port, &GPIO_InitStruct);
-
     GPIO_InitStruct.Pin = TPS_ADC_Pin|SWITCH_ADC_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -169,61 +168,14 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     __HAL_RCC_ADC1_CLK_DISABLE();
   
     /**ADC1 GPIO Configuration    
-    PA7     ------> ADC1_IN7
     PB0     ------> ADC1_IN8
     PB1     ------> ADC1_IN9 
     */
-    HAL_GPIO_DeInit(VNH2_SP30_CS_GPIO_Port, VNH2_SP30_CS_Pin);
-
     HAL_GPIO_DeInit(GPIOB, TPS_ADC_Pin|SWITCH_ADC_Pin);
 
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 
   /* USER CODE END ADC1_MspDeInit 1 */
-  }
-
-}
-
-/**
-* @brief CRC MSP Initialization
-* This function configures the hardware resources used in this example
-* @param hcrc: CRC handle pointer
-* @retval None
-*/
-void HAL_CRC_MspInit(CRC_HandleTypeDef* hcrc)
-{
-  if(hcrc->Instance==CRC)
-  {
-  /* USER CODE BEGIN CRC_MspInit 0 */
-
-  /* USER CODE END CRC_MspInit 0 */
-    /* Peripheral clock enable */
-    __HAL_RCC_CRC_CLK_ENABLE();
-  /* USER CODE BEGIN CRC_MspInit 1 */
-
-  /* USER CODE END CRC_MspInit 1 */
-  }
-
-}
-
-/**
-* @brief CRC MSP De-Initialization
-* This function freeze the hardware resources used in this example
-* @param hcrc: CRC handle pointer
-* @retval None
-*/
-void HAL_CRC_MspDeInit(CRC_HandleTypeDef* hcrc)
-{
-  if(hcrc->Instance==CRC)
-  {
-  /* USER CODE BEGIN CRC_MspDeInit 0 */
-
-  /* USER CODE END CRC_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_CRC_CLK_DISABLE();
-  /* USER CODE BEGIN CRC_MspDeInit 1 */
-
-  /* USER CODE END CRC_MspDeInit 1 */
   }
 
 }

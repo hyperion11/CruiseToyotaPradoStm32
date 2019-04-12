@@ -96,8 +96,6 @@ void Error_Handler(void);
 #define VNH2_SP30_PWM_GPIO_Port GPIOA
 #define STOP_IN_PA3_Pin GPIO_PIN_3
 #define STOP_IN_PA3_GPIO_Port GPIOA
-#define VNH2_SP30_CS_Pin GPIO_PIN_7
-#define VNH2_SP30_CS_GPIO_Port GPIOA
 #define TPS_ADC_Pin GPIO_PIN_0
 #define TPS_ADC_GPIO_Port GPIOB
 #define SWITCH_ADC_Pin GPIO_PIN_1
