@@ -108,7 +108,7 @@ volatile bool dir_current, dir_previous;
 volatile uint16_t rpm_ticks = 0, rpm = 0;
 volatile uint16_t second;
 volatile uint8_t NewKeyValue = 5;
-const uint16_t values[5] = { 0, 374, 834, 1373, 2125 };
+const uint16_t values[5] = { 0, 366, 825, 1367, 2117 };
 const uint8_t error = 65;       // Величина отклонения от значений - погрешность
 static u8g2_t u8g2;
 uint32_t amountsent = 0;
@@ -219,6 +219,7 @@ void disarm(void) {
 	HAL_GPIO_WritePin(GPIOB, PB10_OUT_SOLENOID_Pin, GPIO_PIN_RESET);
 	//отключение индикатора круиза
 	HAL_GPIO_WritePin(GPIOB, CRUISE_LAMP_OUT_PB15_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, TB6612FNG_STB_Pin, GPIO_PIN_RESET);
 	//останов привода круиза
 	setMSpeed(0);
 	arm_pid_reset_f32(&PID);
@@ -239,6 +240,7 @@ void arm() {
 	HAL_GPIO_WritePin(GPIOB, PB10_OUT_SOLENOID_Pin, GPIO_PIN_SET);
 	//включение индикатора круиза
 	HAL_GPIO_WritePin(GPIOB, CRUISE_LAMP_OUT_PB15_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, TB6612FNG_STB_Pin, GPIO_PIN_SET);
 	CheckCruiseAndDisarm(STP, AT_D, IDLE, rpm, SPD_CURRENT);
 }
 
@@ -327,6 +329,7 @@ uint8_t ReadCruiseSwitch() {
 	if (OldKeyValue == NewKeyValue && NewKeyValue != 5)
 		detectlongpress[NewKeyValue] += 1;
 	//Обработка нажатой клавиши в момент ее отпускания. Одновременно с проверкой на долгое нажатие.
+	//const uint16_t values[5] = { 0, 374, 834, 1373, 2125 };
 	if (OldKeyValue != NewKeyValue && NewKeyValue == 5) {
 		switch (OldKeyValue) {
 		case 1: {
@@ -643,6 +646,7 @@ int main(void)
 	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+	HAL_Delay(100); //задержка для стабилизации напряжения чтобы SSD1306 корректно стартовал
 	u8g2_Setup_ssd1306_i2c_128x64_noname_1(&u8g2, U8G2_R0,
 			u8x8_byte_stm32f103_hw_i2c, u8x8_gpio_and_delay_mine);
 	u8g2_InitDisplay(&u8g2); // send init sequence to the display, display is in sleep mode after this,
@@ -726,11 +730,12 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -745,7 +750,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -1045,11 +1050,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PD0 PD1 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
   /*Configure GPIO pins : PA1 PA2 PA4 PA5 
                            PA6 PA7 PA9 PA10 
                            PA11 PA12 PA15 */
@@ -1065,10 +1065,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(STOP_IN_PA3_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : TB6612FNG_STB_Pin PB10_OUT_SOLENOID_Pin OD_OUT_BUTTON_PB13_Pin CRUISE_LAMP_OUT_PB15_Pin 
-                           PB5 VNH2_SP30_INA_Pin VNH2_SP30_INB_Pin */
-  GPIO_InitStruct.Pin = TB6612FNG_STB_Pin|PB10_OUT_SOLENOID_Pin|OD_OUT_BUTTON_PB13_Pin|CRUISE_LAMP_OUT_PB15_Pin 
-                          |GPIO_PIN_5|VNH2_SP30_INA_Pin|VNH2_SP30_INB_Pin;
+  /*Configure GPIO pin : TB6612FNG_STB_Pin */
+  GPIO_InitStruct.Pin = TB6612FNG_STB_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(TB6612FNG_STB_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB10_OUT_SOLENOID_Pin OD_OUT_BUTTON_PB13_Pin CRUISE_LAMP_OUT_PB15_Pin PB5 
+                           VNH2_SP30_INA_Pin VNH2_SP30_INB_Pin */
+  GPIO_InitStruct.Pin = PB10_OUT_SOLENOID_Pin|OD_OUT_BUTTON_PB13_Pin|CRUISE_LAMP_OUT_PB15_Pin|GPIO_PIN_5 
+                          |VNH2_SP30_INA_Pin|VNH2_SP30_INB_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -1102,9 +1109,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pin = GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure peripheral I/O remapping */
-  __HAL_AFIO_REMAP_PD01_ENABLE();
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);

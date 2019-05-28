@@ -32,3 +32,10 @@ STM32CubeMX/.settings/language.settings.xml
 *.b#8
 *.b#9
 *.log
+*.launch
+*.launch
+STM32CubeMX/Cruise.elf.launch
+*.s##
+*.xml
+*.xml
+*.xml
