@@ -1035,8 +1035,8 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(PC13_GPIO_Port, PC13_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, TB6612FNG_STB_Pin|PB10_OUT_SOLENOID_Pin|OD_OUT_BUTTON_PB13_Pin|CRUISE_LAMP_OUT_PB15_Pin 
-                          |GPIO_PIN_5|VNH2_SP30_INA_Pin|VNH2_SP30_INB_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, PB10_OUT_SOLENOID_Pin|OD_OUT_BUTTON_PB13_Pin|CRUISE_LAMP_OUT_PB15_Pin|TB6612FNG_STB_Pin 
+                          |VNH2_SP30_INA_Pin|VNH2_SP30_INB_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PC13_Pin */
   GPIO_InitStruct.Pin = PC13_Pin;
@@ -1065,17 +1065,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(STOP_IN_PA3_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : TB6612FNG_STB_Pin */
-  GPIO_InitStruct.Pin = TB6612FNG_STB_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(TB6612FNG_STB_GPIO_Port, &GPIO_InitStruct);
+  /*Configure GPIO pins : PB2 PB3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB10_OUT_SOLENOID_Pin OD_OUT_BUTTON_PB13_Pin CRUISE_LAMP_OUT_PB15_Pin PB5 
-                           VNH2_SP30_INA_Pin VNH2_SP30_INB_Pin */
-  GPIO_InitStruct.Pin = PB10_OUT_SOLENOID_Pin|OD_OUT_BUTTON_PB13_Pin|CRUISE_LAMP_OUT_PB15_Pin|GPIO_PIN_5 
-                          |VNH2_SP30_INA_Pin|VNH2_SP30_INB_Pin;
+  /*Configure GPIO pins : PB10_OUT_SOLENOID_Pin OD_OUT_BUTTON_PB13_Pin CRUISE_LAMP_OUT_PB15_Pin VNH2_SP30_INA_Pin 
+                           VNH2_SP30_INB_Pin */
+  GPIO_InitStruct.Pin = PB10_OUT_SOLENOID_Pin|OD_OUT_BUTTON_PB13_Pin|CRUISE_LAMP_OUT_PB15_Pin|VNH2_SP30_INA_Pin 
+                          |VNH2_SP30_INB_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -1105,10 +1103,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(D_IN_PA8_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PB3 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  /*Configure GPIO pin : TB6612FNG_STB_Pin */
+  GPIO_InitStruct.Pin = TB6612FNG_STB_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(TB6612FNG_STB_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);

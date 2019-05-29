@@ -100,8 +100,6 @@ void Error_Handler(void);
 #define TPS_ADC_GPIO_Port GPIOB
 #define SWITCH_ADC_Pin GPIO_PIN_1
 #define SWITCH_ADC_GPIO_Port GPIOB
-#define TB6612FNG_STB_Pin GPIO_PIN_2
-#define TB6612FNG_STB_GPIO_Port GPIOB
 #define PB10_OUT_SOLENOID_Pin GPIO_PIN_10
 #define PB10_OUT_SOLENOID_GPIO_Port GPIOB
 #define RPM_EXTI11_Pin GPIO_PIN_11
@@ -119,6 +117,8 @@ void Error_Handler(void);
 #define D_IN_PA8_GPIO_Port GPIOA
 #define TIM3_CH2_SPD_Pin GPIO_PIN_4
 #define TIM3_CH2_SPD_GPIO_Port GPIOB
+#define TB6612FNG_STB_Pin GPIO_PIN_5
+#define TB6612FNG_STB_GPIO_Port GPIOB
 #define VNH2_SP30_INA_Pin GPIO_PIN_8
 #define VNH2_SP30_INA_GPIO_Port GPIOB
 #define VNH2_SP30_INB_Pin GPIO_PIN_9
