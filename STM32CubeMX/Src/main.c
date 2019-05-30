@@ -492,9 +492,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 
 }
+//todo: обороты были завышены в два раза
 void CalculateRPM() {
 	if (second == 10) {
-		rpm = rpm_ticks * 40;
+		rpm = rpm_ticks * 40 / 2;
 		second = 0;
 		rpm_ticks = 0;
 		pwm += 50;
